@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\User;
-use App\Transaction;
-use App\Services\TransactionService;
 use App\Http\Requests\Api\LoginUser;
 use App\Http\Requests\Api\RegisterUser;
 use App\RealWorld\Transformers\UserTransformer;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends ApiController
@@ -46,15 +44,18 @@ class AuthController extends ApiController
      * @param RegisterUser $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(RegisterUser $request, TransactionService $transactionService)
+    public function register(RegisterUser $request, UserService $userService)
     {
-        $user = User::create([
+        $parameters = [
             'username' => $request->input('user.username'),
             'email' => $request->input('user.email'),
             'password' => bcrypt($request->input('user.password')),
-        ]);
+        ];
+        $user = $userService->createUser($parameters);
 
-        $transactionService->deposit($user, Transaction::DEPOSIT_AMOUNT_ON_REGISTRATION);
+        if ($user === null) {
+            return $this->respondInternalError();
+        }
 
         return $this->respondWithTransformer($user);
     }
