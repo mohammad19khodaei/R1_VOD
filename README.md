@@ -10,3 +10,4 @@ To install the application please run the following commands
 * Run `composer install` inside the container to install the dependencies
 * Run `php artisan key:generate` inside the container to generate application key
 * Run `php artisan migrate` inside the container to migrate db
+* Run `php artisan jwt:secret` inside the container to generate jwt secret key

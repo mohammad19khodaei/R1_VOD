@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use Auth;
 use App\User;
 use App\Http\Requests\Api\LoginUser;
 use App\Http\Requests\Api\RegisterUser;
 use App\RealWorld\Transformers\UserTransformer;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends ApiController
 {
