@@ -4,6 +4,7 @@ namespace App;
 
 use App\RealWorld\Follow\Followable;
 use App\RealWorld\Favorite\HasFavorite;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -85,9 +86,9 @@ class User extends Authenticatable implements JWTSubject
     /**
      * Get all the articles of the following users.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return Builder
      */
-    public function feed(): HasMany
+    public function feed(): Builder
     {
         $followingIds = $this->following()->pluck('id')->toArray();
 
