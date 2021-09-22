@@ -1,0 +1,56 @@
+version: "3.7"
+
+services:
+  app:
+    build:
+      args:
+        user: mohammad
+        uid: 1000
+      context: ./.docker/php
+      dockerfile: Dockerfile
+    image: r1_vod
+    container_name: r1-vod-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - r1vod
+  db:
+    image: mysql:8.0
+    container_name: r1-vod-db
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    environment:
+        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        MYSQL_DATABASE: ${DB_DATABASE}
+        MYSQL_USER: ${DB_USERNAME}
+        MYSQL_PASSWORD: ${DB_PASSWORD}
+        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - r1vod
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+      retries: 3
+      timeout: 5s
+  nginx:
+    image: nginx:1.17-alpine
+    container_name: r1-vod-nginx
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - ./:/var/www
+      - ./.docker/nginx:/etc/nginx/conf.d
+    networks:
+      - r1vod
+
+networks:
+  r1vod:
+    driver: bridge
+volumes:
+  db-data:
+    driver: local
