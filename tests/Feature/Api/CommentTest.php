@@ -2,6 +2,10 @@
 
 namespace Tests\Feature\Api;
 
+use App\Comment;
+use App\Enums\TransactionAmount;
+use App\Enums\TransactionType;
+use App\Transaction;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -19,13 +23,15 @@ class CommentTest extends TestCase
     }
 
     /** @test */
-    public function it_return_success_response_when_comment_count_is_under_five_without_decrease_user_charge()
+    public function it_return_success_response_when_comment_count_is_under_max_count_without_decrease_user_charge()
     {
         $this->loggedInUser->update(['charge' => 5000]);
         $this->article
             ->comments()
             ->saveMany(
-                factory(\App\Comment::class)->times(2)->make(['user_id' => $this->loggedInUser->id])
+                factory(\App\Comment::class)
+                    ->times(Comment::MAX_NUMBER_OF_FREE_COMMENT - 1)
+                    ->make(['user_id' => $this->loggedInUser->id])
             );
 
         $data = [
@@ -36,17 +42,21 @@ class CommentTest extends TestCase
         $this->postJson("/api/articles/{$this->article->slug}/comments", $data, $this->headers)
             ->assertStatus(200);
 
+
+        $this->loggedInUser = $this->loggedInUser->fresh();
         $this->assertEquals(5000, $this->loggedInUser->charge);
     }
 
     /** @test */
-    public function it_return_success_response_when_comment_count_is_above_five_with_decrease_user_charge()
+    public function it_return_success_response_when_comment_count_is_above_max_count_with_decrease_user_charge()
     {
-        $this->loggedInUser->update(['charge' => 5000]);
+        $this->loggedInUser->update(['charge' => 4000]);
         $this->article
             ->comments()
             ->saveMany(
-                factory(\App\Comment::class)->times(5)->make(['user_id' => $this->loggedInUser->id])
+                factory(\App\Comment::class)
+                    ->times(Comment::MAX_NUMBER_OF_FREE_COMMENT)
+                    ->make(['user_id' => $this->loggedInUser->id])
             );
 
         $data = [
@@ -58,17 +68,19 @@ class CommentTest extends TestCase
             ->assertStatus(200);
 
         $this->loggedInUser = $this->loggedInUser->fresh();
-        $this->assertEquals(0, $this->loggedInUser->charge);
+        $this->assertEquals(-1000, $this->loggedInUser->charge);
     }
 
     /** @test */
-    public function it_return_forbidden_error_when_trying_add_sixth_comment_without_enough_charge()
+    public function it_return_forbidden_error_when_trying_add_first_none_free_comment_without_enough_charge()
     {
         $this->loggedInUser->update(['charge' => -1000]);
         $this->article
             ->comments()
             ->saveMany(
-                factory(\App\Comment::class)->times(5)->make(['user_id' => $this->loggedInUser->id])
+                factory(\App\Comment::class)
+                    ->times(Comment::MAX_NUMBER_OF_FREE_COMMENT)
+                    ->make(['user_id' => $this->loggedInUser->id])
             );
         $data = [
             'comment' => [
@@ -106,6 +118,39 @@ class CommentTest extends TestCase
                     ],
                 ]
             ]);
+    }
+
+    /** @test */
+    public function it_create_transaction_and_factor_on_adding_a_new_comment()
+    {
+        $this->loggedInUser->update(['charge' => 5000]);
+        $this->article
+            ->comments()
+            ->saveMany(
+                factory(\App\Comment::class)->times(5)->make(['user_id' => $this->loggedInUser->id])
+            );
+
+        $data = [
+            'comment' => [
+                'body' => 'This is a comment'
+            ]
+        ];
+        $this->postJson("/api/articles/{$this->article->slug}/comments", $data, $this->headers)
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('transactions', [
+            'user_id' => $this->loggedInUser->id,
+            'amount' => TransactionAmount::COMMENT_CREATION_WITHDRAW,
+            'type' => TransactionType::WITHDRAWAL,
+        ]);
+
+        $transaction = Transaction::query()->latest('id')->first();
+        $comment = $this->article->comments()->latest('id')->first();
+        $this->assertDatabaseHas('factors', [
+            'transaction_id' => $transaction->id,
+            'product_id' => $comment->id,
+            'product_type' => Comment::class,
+        ]);
     }
 
     /** @test */
