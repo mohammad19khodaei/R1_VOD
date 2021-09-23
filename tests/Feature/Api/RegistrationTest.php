@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Api;
 
+use App\Enums\TransactionAmount;
+use App\Enums\TransactionType;
+use App\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -24,15 +27,42 @@ class RegistrationTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-            'user' => [
-                'email' => 'test@test.com',
-                'username' => 'test',
-                'bio' => null,
-                'image' => null,
-            ]
-        ]);
+                'user' => [
+                    'email' => 'test@test.com',
+                    'username' => 'test',
+                    'bio' => null,
+                    'image' => null,
+                ]
+            ]);
 
         $this->assertArrayHasKey('token', $response->json()['user'], 'Token not found');
+    }
+
+    /** @test */
+    public function it_charge_user_account_on_valid_registration()
+    {
+        $data = [
+            'user' => [
+                'username' => 'test',
+                'email' => 'test@test.com',
+                'password' => 'secret',
+            ]
+        ];
+
+        $this->postJson('/api/users', $data);
+
+        $this->assertDatabaseHas('users', [
+            'username' => 'test',
+            'email' => 'test@test.com',
+            'charge' => TransactionAmount::REGISTRATION_DEPOSIT
+        ]);
+
+        $user = User::query()->latest('id')->first();
+        $this->assertDatabaseHas('transactions', [
+            'user_id' => $user->id,
+            'amount' => TransactionAmount::REGISTRATION_DEPOSIT,
+            'type' => TransactionType::DEPOSIT,
+        ]);
     }
 
     /** @test */
