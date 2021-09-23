@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Contracts\ProductContract;
 use App\User;
 use App\Comment;
 use App\Article;
@@ -46,13 +47,12 @@ class TransactionService
     }
 
     /**
-     * @param $product
+     * @param ProductContract $product
      * @throws \Exception
      */
-    public function createFactor($product): void
+    public function createFactor(ProductContract $product): void
     {
         $this->checkTransaction();
-        $this->checkProduct($product);
 
         $this->transaction->factors()->create([
             'factor_number' => bin2hex(random_bytes(20)),
@@ -65,17 +65,6 @@ class TransactionService
     {
         if (is_null($this->transaction)) {
             throw new \Exception('Factor only can be created for a transaction');
-        }
-    }
-
-    protected function checkProduct($product): void
-    {
-        $allowedProducts = [Article::class, Comment::class];
-        if (
-            is_null(optional($product)->id) ||
-            !in_array(get_class($product), $allowedProducts)
-        ) {
-            throw new \Exception('Invalid input product');
         }
     }
 }
