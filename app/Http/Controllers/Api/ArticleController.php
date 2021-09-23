@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Tag;
+use App\Exceptions\NotEnoughChargeException;
+use App\Services\ArticleService;
+use App\Services\TagService;
 use App\Article;
 use App\RealWorld\Paginate\Paginate;
 use App\RealWorld\Filters\ArticleFilter;
@@ -45,26 +47,26 @@ class ArticleController extends ApiController
      * @param CreateArticle $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(CreateArticle $request)
+    public function store(CreateArticle $request, ArticleService $articleService, TagService $tagService)
     {
-        $user = auth()->user();
-
-        $article = $user->articles()->create([
+        $parameters = [
             'title' => $request->input('article.title'),
             'description' => $request->input('article.description'),
             'body' => $request->input('article.body'),
-        ]);
+        ];
 
-        $inputTags = $request->input('article.tagList');
-
-        if ($inputTags && ! empty($inputTags)) {
-
-            $tags = array_map(function($name) {
-                return Tag::firstOrCreate(['name' => $name])->id;
-            }, $inputTags);
-
-            $article->tags()->attach($tags);
+        try {
+            $article = $articleService->createArticle(auth()->id(), $parameters);
+        } catch (NotEnoughChargeException $exception) {
+            return $this->respondForbidden($exception->getMessage());
         }
+
+        if ($article === null) {
+            return $this->respondInternalError();
+        }
+
+        $inputTags = $request->input('article.tagList', []);
+        $tagService->addArticleTags($article, $inputTags);
 
         return $this->respondWithTransformer($article);
     }

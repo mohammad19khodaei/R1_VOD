@@ -2,6 +2,7 @@
 
 use App\User;
 use Illuminate\Database\Seeder;
+use App\Enums\TransactionAmount;
 use App\Services\TransactionService;
 
 class DummyDataSeeder extends Seeder
@@ -75,7 +76,7 @@ class DummyDataSeeder extends Seeder
             ->create()
             ->each(function (User $user) {
                 (new TransactionService())
-                    ->deposit($user, \App\Transaction::DEPOSIT_AMOUNT_ON_REGISTRATION);
+                    ->deposit($user, TransactionAmount::REGISTRATION_DEPOSIT);
             });
 
         // a user for authentication

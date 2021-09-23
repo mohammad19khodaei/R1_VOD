@@ -2,12 +2,40 @@
 
 namespace Tests\Feature\Api;
 
+use App\Article;
+use App\Enums\TransactionAmount;
+use App\Enums\TransactionType;
+use App\Transaction;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class ArticleCreateTest extends TestCase
 {
     use DatabaseMigrations;
+
+    /** @test */
+    public function it_return_forbidden_error_when_trying_to_add_article_without_enough_charge()
+    {
+        $this->loggedInUser->update(['charge' => -1000]);
+
+        $data = [
+            'article' => [
+                'title' => 'test title',
+                'description' => 'test description',
+                'body' => 'test body with random text',
+            ]
+        ];
+
+        $response = $this->postJson('/api/articles', $data, $this->headers);
+
+        $response->assertStatus(403)
+            ->assertJson([
+                'errors' => [
+                    'message' => 'Not Enough Charge',
+                    'status_code' => 403
+                ]
+            ]);
+    }
 
     /** @test */
     public function it_returns_the_article_on_successfully_creating_a_new_article()
@@ -54,6 +82,79 @@ class ArticleCreateTest extends TestCase
                     'author' => [
                         'username' => $this->loggedInUser->username,
                     ]
+                ]
+            ]);
+    }
+
+    /** @test */
+    public function it_decrease_charge_of_user_on_creating_a_new_article()
+    {
+        $data = [
+            'article' => [
+                'title' => 'test title',
+                'description' => 'test description',
+                'body' => 'test body with random text',
+            ]
+        ];
+
+        $this->postJson('/api/articles', $data, $this->headers);
+
+        $this->assertDatabaseHas('users', [
+            'username' => $this->loggedInUser->username,
+            'email' => $this->loggedInUser->email,
+            'charge' => TransactionAmount::REGISTRATION_DEPOSIT - TransactionAmount::ARTICLE_CREATION_WITHDRAW
+        ]);
+    }
+
+    /** @test */
+    public function it_create_transaction_and_factor_on_creating_a_new_article()
+    {
+        $data = [
+            'article' => [
+                'title' => 'test title',
+                'description' => 'test description',
+                'body' => 'test body with random text',
+            ]
+        ];
+
+        $this->postJson('/api/articles', $data, $this->headers);
+
+        $this->assertDatabaseHas('transactions', [
+            'user_id' => $this->loggedInUser->id,
+            'amount' => TransactionAmount::ARTICLE_CREATION_WITHDRAW,
+            'type' => TransactionType::WITHDRAWAL,
+        ]);
+
+        $transaction = Transaction::query()->latest('id')->first();
+        $product = Article::query()->latest('id')->first();
+        $this->assertDatabaseHas('factors', [
+            'transaction_id' => $transaction->id,
+            'product_id' => $product->id,
+            'product_type' => Article::class,
+        ]);
+    }
+
+    /** @test */
+    public function it_return_forbbiden_resoponse_for_second_request_if_charge_is_not_enough_for_two_request()
+    {
+        $this->loggedInUser->update(['charge' => 3000]);
+
+        $data = [
+            'article' => [
+                'title' => 'test title',
+                'description' => 'test description',
+                'body' => 'test body with random text',
+            ]
+        ];
+
+        $this->postJson('/api/articles', $data, $this->headers)->assertStatus(200);
+
+        $response = $this->postJson('/api/articles', $data, $this->headers);
+        $response->assertStatus(403)
+            ->assertJson([
+                'errors' => [
+                    'message' => 'Not Enough Charge',
+                    'status_code' => 403
                 ]
             ]);
     }
