@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Article;
 use App\Comment;
+use App\Exceptions\NotEnoughChargeException;
 use App\Http\Requests\Api\CreateComment;
 use App\Http\Requests\Api\DeleteComment;
 use App\RealWorld\Transformers\CommentTransformer;
+use App\Services\CommentService;
+use App\User;
 
 class CommentController extends ApiController
 {
@@ -45,10 +48,21 @@ class CommentController extends ApiController
      */
     public function store(CreateComment $request, Article $article)
     {
-        $comment = $article->comments()->create([
-            'body' => $request->input('comment.body'),
-            'user_id' => auth()->id(),
-        ]);
+        /** @var User $user */
+        $user = auth()->user();
+        try {
+            $comment = (new CommentService())->addComment(
+                $article,
+                $user,
+                $request->input('comment.body')
+            );
+        } catch (NotEnoughChargeException $exception) {
+            return $this->respondForbidden($exception->getMessage());
+        }
+
+        if ($comment === null) {
+            return $this->respondInternalError();
+        }
 
         return $this->respondWithTransformer($comment);
     }
