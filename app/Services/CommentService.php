@@ -41,6 +41,7 @@ class CommentService
             DB::commit();
             throw new NotEnoughChargeException();
         } catch (\Exception $exception) {
+            $comment = null;
             Log::error($exception->getMessage());
             DB::rollback();
         }

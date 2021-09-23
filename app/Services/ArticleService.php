@@ -40,6 +40,7 @@ class ArticleService
             DB::commit();
             throw new NotEnoughChargeException();
         } catch (\Exception $exception) {
+            $article = null;
             Log::error($exception->getMessage());
             DB::rollback();
         }
