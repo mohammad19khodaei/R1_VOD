@@ -19,6 +19,74 @@ class CommentTest extends TestCase
     }
 
     /** @test */
+    public function it_return_success_response_when_comment_count_is_under_five_without_decrease_user_charge()
+    {
+        $this->loggedInUser->update(['charge' => 5000]);
+        $this->article
+            ->comments()
+            ->saveMany(
+                factory(\App\Comment::class)->times(2)->make(['user_id' => $this->loggedInUser->id])
+            );
+
+        $data = [
+            'comment' => [
+                'body' => 'This is a comment'
+            ]
+        ];
+        $this->postJson("/api/articles/{$this->article->slug}/comments", $data, $this->headers)
+            ->assertStatus(200);
+
+        $this->assertEquals(5000, $this->loggedInUser->charge);
+    }
+
+    /** @test */
+    public function it_return_success_response_when_comment_count_is_above_five_with_decrease_user_charge()
+    {
+        $this->loggedInUser->update(['charge' => 5000]);
+        $this->article
+            ->comments()
+            ->saveMany(
+                factory(\App\Comment::class)->times(5)->make(['user_id' => $this->loggedInUser->id])
+            );
+
+        $data = [
+            'comment' => [
+                'body' => 'This is a comment'
+            ]
+        ];
+        $this->postJson("/api/articles/{$this->article->slug}/comments", $data, $this->headers)
+            ->assertStatus(200);
+
+        $this->loggedInUser = $this->loggedInUser->fresh();
+        $this->assertEquals(0, $this->loggedInUser->charge);
+    }
+
+    /** @test */
+    public function it_return_forbidden_error_when_trying_add_sixth_comment_without_enough_charge()
+    {
+        $this->loggedInUser->update(['charge' => -1000]);
+        $this->article
+            ->comments()
+            ->saveMany(
+                factory(\App\Comment::class)->times(5)->make(['user_id' => $this->loggedInUser->id])
+            );
+        $data = [
+            'comment' => [
+                'body' => 'This is a comment'
+            ]
+        ];
+        $response = $this->postJson("/api/articles/{$this->article->slug}/comments", $data, $this->headers);
+
+        $response->assertStatus(403)
+            ->assertJson([
+                'errors' => [
+                    'message' => 'Not Enough Charge',
+                    'status_code' => 403
+                ]
+            ]);
+    }
+
+    /** @test */
     public function it_returns_the_comment_on_successfully_adding_a_comment_to_the_article()
     {
         $data = [

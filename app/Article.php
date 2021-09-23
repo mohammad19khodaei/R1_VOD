@@ -2,12 +2,13 @@
 
 namespace App;
 
+use App\Contracts\ProductContract;
 use App\RealWorld\Slug\HasSlug;
 use App\RealWorld\Filters\Filterable;
 use App\RealWorld\Favorite\Favoritable;
 use Illuminate\Database\Eloquent\Model;
 
-class Article extends Model
+class Article extends Model implements ProductContract
 {
     use Favoritable, Filterable, HasSlug;
 
@@ -48,8 +49,8 @@ class Article extends Model
     public function scopeLoadRelations($query)
     {
         return $query->with(['user.followers' => function ($query) {
-                $query->where('follower_id', auth()->id());
-            }])
+            $query->where('follower_id', auth()->id());
+        }])
             ->with(['favorited' => function ($query) {
                 $query->where('user_id', auth()->id());
             }])
