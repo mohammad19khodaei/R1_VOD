@@ -4,5 +4,6 @@ namespace App\Enums;
 
 class TransactionAmount
 {
-    const REGISTRATION_DEPOSIT = 100000;
+    public const REGISTRATION_DEPOSIT = 100000;
+    public const ARTICLE_CREATION_WITHDRAW = 5000;
 }

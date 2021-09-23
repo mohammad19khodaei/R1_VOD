@@ -6,6 +6,7 @@ use App\RealWorld\Follow\Followable;
 use App\RealWorld\Favorite\HasFavorite;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -81,6 +82,16 @@ class User extends Authenticatable implements JWTSubject
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class)->latest();
+    }
+
+    /**
+     * Get all the factors of the following users.
+     *
+     * @return HasManyThrough
+     */
+    public function factors(): HasManyThrough
+    {
+        return $this->hasManyThrough(Factor::class, Transaction::class);
     }
 
     /**

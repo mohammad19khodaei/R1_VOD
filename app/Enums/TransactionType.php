@@ -4,6 +4,6 @@ namespace App\Enums;
 
 final class TransactionType
 {
-    const DEPOSIT = 1;
-    const WITHDRAWAL = 2;
+    public const DEPOSIT = 1;
+    public const WITHDRAWAL = 2;
 }
