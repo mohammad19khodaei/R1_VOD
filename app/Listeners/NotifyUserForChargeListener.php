@@ -3,8 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\UserUpdated;
+use App\Mail\LowUserCharge;
+use Illuminate\Support\Facades\Mail;
 
-class NotifyUserForCharge
+class NotifyUserForChargeListener
 {
     /**
      * Handle the event.
@@ -16,7 +18,10 @@ class NotifyUserForCharge
     {
         $user = $event->user;
         if ($user->isDirty('charge') && $user->notifyIsRequired()) {
-            info('send email');
+            $message = (new LowUserCharge($user))
+                ->onConnection('redis')
+                ->onQueue('email');
+            Mail::to($user->email)->queue($message);
             $user->notifications()->create();
         }
     }
