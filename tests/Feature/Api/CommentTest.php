@@ -7,6 +7,7 @@ use App\Enums\TransactionAmount;
 use App\Enums\TransactionType;
 use App\Transaction;
 use App\User;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -252,5 +253,46 @@ class CommentTest extends TestCase
         $response = $this->deleteJson("/api/articles/somerandomslug/comments/999", [], $this->headers);
 
         $response->assertStatus(404);
+    }
+
+    /** @test */
+    public function it_disable_user_if_charge_become_negative_after_add_new_comment()
+    {
+        Mail::fake();
+        $this->loggedInUser->update(['charge' => 3000]);
+
+        $this->article
+            ->comments()
+            ->saveMany(
+                factory(\App\Comment::class)
+                    ->times(Comment::MAX_NUMBER_OF_FREE_COMMENT)
+                    ->make(['user_id' => $this->loggedInUser->id])
+            );
+
+
+        $data = [
+            'comment' => [
+                'body' => 'This is a comment'
+            ]
+        ];
+        $this->postJson("/api/articles/{$this->article->slug}/comments", $data, $this->headers);
+
+        $user = User::query()->whereKey($this->loggedInUser->id)->first();
+        $this->assertNotNull($user->disabled_at);
+    }
+
+    /** @test */
+    public function it_return_forbidden_response_if_disabled_user_want_to_add_new_comment()
+    {
+        User::unsetEventDispatcher();
+        $this->loggedInUser->update(['disabled_at' => now()]);
+
+        $data = [
+            'comment' => [
+                'body' => 'This is a comment'
+            ]
+        ];
+        $this->postJson("/api/articles/{$this->article->slug}/comments", $data, $this->headers)
+            ->assertStatus(403);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Events\UserUpdated;
+use App\Listeners\DisableUserListener;
 use App\Listeners\NotifyUserForChargeListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
@@ -15,7 +16,8 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         UserUpdated::class => [
-            NotifyUserForChargeListener::class
+            NotifyUserForChargeListener::class,
+            DisableUserListener::class,
         ],
     ];
 

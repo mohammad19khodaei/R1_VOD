@@ -23,7 +23,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'password', 'bio', 'image', 'charge'
+        'username', 'email', 'password', 'bio', 'image', 'charge', 'disabled_at'
     ];
 
     /**
@@ -165,5 +165,10 @@ class User extends Authenticatable implements JWTSubject
     public function isNotifiedBefore(): bool
     {
         return $this->notifications()->where('in_progress', 1)->exists();
+    }
+
+    public function isDisabled(): bool
+    {
+        return !is_null($this->disabled_at);
     }
 }
