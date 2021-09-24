@@ -23,11 +23,11 @@ services:
     ports:
       - 3306:3306
     environment:
-        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-        MYSQL_DATABASE: ${DB_DATABASE}
-        MYSQL_USER: ${DB_USERNAME}
-        MYSQL_PASSWORD: ${DB_PASSWORD}
-        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
       - db-data:/var/lib/mysql
     networks:
@@ -47,10 +47,24 @@ services:
       - ./.docker/nginx:/etc/nginx/conf.d
     networks:
       - r1vod
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/data
+    networks:
+      - r1vod
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      retries: 3
+      timeout: 5s
 
 networks:
   r1vod:
     driver: bridge
 volumes:
   db-data:
+    driver: local
+  redis-data:
     driver: local

@@ -2,20 +2,21 @@
 
 namespace App;
 
+use App\Events\UserUpdated;
 use App\RealWorld\Follow\Followable;
 use App\RealWorld\Favorite\HasFavorite;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable, Followable, HasFavorite;
+    use Followable, HasFavorite;
 
+    public const NOTIFY_USER_CHARGE_THRESHOLD = 20000;
     /**
      * The attributes that are mass assignable.
      *
@@ -32,6 +33,15 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $hidden = [
         'password', 'remember_token',
+    ];
+
+    /**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'updated' => UserUpdated::class,
     ];
 
     /**
@@ -95,6 +105,16 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Get all the notifications of the following users.
+     *
+     * @return HasMany
+     */
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
      * Get all the articles of the following users.
      *
      * @return Builder
@@ -134,5 +154,16 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [];
+    }
+
+    public function notifyIsRequired(): bool
+    {
+        $newCharge = optional($this->fresh())->getAttribute('charge');
+        return $newCharge < self::NOTIFY_USER_CHARGE_THRESHOLD && !$this->isNotifiedBefore();
+    }
+
+    public function isNotifiedBefore(): bool
+    {
+        return $this->notifications()->where('in_progress', 1)->exists();
     }
 }
