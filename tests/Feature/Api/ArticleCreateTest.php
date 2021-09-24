@@ -6,6 +6,7 @@ use App\Article;
 use App\Enums\TransactionAmount;
 use App\Enums\TransactionType;
 use App\Transaction;
+use App\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -16,6 +17,7 @@ class ArticleCreateTest extends TestCase
     /** @test */
     public function it_return_forbidden_error_when_trying_to_add_article_without_enough_charge()
     {
+        User::unsetEventDispatcher();
         $this->loggedInUser->update(['charge' => -1000]);
 
         $data = [
@@ -137,6 +139,7 @@ class ArticleCreateTest extends TestCase
     /** @test */
     public function it_return_forbbiden_resoponse_for_second_request_if_charge_is_not_enough_for_two_request()
     {
+        User::unsetEventDispatcher();
         $this->loggedInUser->update(['charge' => 3000]);
 
         $data = [

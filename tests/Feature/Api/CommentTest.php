@@ -6,6 +6,7 @@ use App\Comment;
 use App\Enums\TransactionAmount;
 use App\Enums\TransactionType;
 use App\Transaction;
+use App\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -25,7 +26,9 @@ class CommentTest extends TestCase
     /** @test */
     public function it_return_success_response_when_comment_count_is_under_max_count_without_decrease_user_charge()
     {
+        User::unsetEventDispatcher();
         $this->loggedInUser->update(['charge' => 5000]);
+
         $this->article
             ->comments()
             ->saveMany(
@@ -50,7 +53,9 @@ class CommentTest extends TestCase
     /** @test */
     public function it_return_success_response_when_comment_count_is_above_max_count_with_decrease_user_charge()
     {
+        User::unsetEventDispatcher();
         $this->loggedInUser->update(['charge' => 4000]);
+
         $this->article
             ->comments()
             ->saveMany(
@@ -74,7 +79,9 @@ class CommentTest extends TestCase
     /** @test */
     public function it_return_forbidden_error_when_trying_add_first_none_free_comment_without_enough_charge()
     {
+        User::unsetEventDispatcher();
         $this->loggedInUser->update(['charge' => -1000]);
+
         $this->article
             ->comments()
             ->saveMany(
@@ -123,7 +130,9 @@ class CommentTest extends TestCase
     /** @test */
     public function it_create_transaction_and_factor_on_adding_a_new_comment()
     {
+        User::unsetEventDispatcher();
         $this->loggedInUser->update(['charge' => 5000]);
+
         $this->article
             ->comments()
             ->saveMany(
