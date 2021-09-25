@@ -31,13 +31,13 @@ class UserFactorTest extends TestCase
                 'factors' => [
                     [
                         'product_id' => $factors[0]['product_id'],
-                        'product_type' => Article::class,
+                        'product_type' => 'Article',
                         'factor_number' => $factors[0]['factor_number'],
                         'amount' => $factors[0]['transaction']['amount']
                     ],
                     [
                         'product_id' => $factors[1]['product_id'],
-                        'product_type' => Article::class,
+                        'product_type' => 'Article',
                         'factor_number' => $factors[1]['factor_number'],
                         'amount' => $factors[1]['transaction']['amount']
                     ]
