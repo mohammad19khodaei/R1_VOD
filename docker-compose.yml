@@ -4,7 +4,7 @@ services:
   app:
     build:
       args:
-        user: mohammad
+        user: arvan
         uid: 1000
       context: ./.docker/php
       dockerfile: Dockerfile
