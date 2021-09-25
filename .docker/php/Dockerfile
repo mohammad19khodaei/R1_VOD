@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    cron
+    cron \
+    vim
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -24,13 +25,10 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-COPY laravel_schedule /etc/cron.d/laravel_schedule
+RUN echo "* * * * * root php /var/www/artisan schedule:run >> /var/log/cron.log 2>&1" >> /etc/crontab
 
-##custom entry point — needed by cron
-USER root
-COPY entrypoint /entrypoint
-RUN chmod +x /entrypoint
-ENTRYPOINT ["/entrypoint"]
+# Apply cron job
+RUN crontab /etc/crontab
 
 # Create system user to run Composer and Artisan Commands
 RUN useradd -G www-data,root -u $uid -d /home/$user $user
@@ -40,4 +38,4 @@ RUN mkdir -p /home/$user/.composer && \
 # Set working directory
 WORKDIR /var/www
 
-USER $user
+CMD bash -c "cron && php-fpm"
