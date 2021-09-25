@@ -55,7 +55,7 @@ class TransactionService
         $this->checkTransaction();
 
         $this->transaction->factors()->create([
-            'factor_number' => bin2hex(random_bytes(20)),
+            'factor_number' => bin2hex(random_bytes(10)),
             'product_id' => $product->id,
             'product_type' => get_class($product),
         ]);

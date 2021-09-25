@@ -9,11 +9,12 @@ class UserTransformer extends Transformer
     public function transform($data)
     {
         return [
-            'email'     => $data['email'],
-            'token'     => $data['token'],
-            'username'  => $data['username'],
-            'bio'       => $data['bio'],
-            'image'     => $data['image'],
+            'email' => $data['email'],
+            'token' => $data['token'],
+            'username' => $data['username'],
+            'bio' => $data['bio'],
+            'image' => $data['image'],
+            'charge' => $data['charge'],
         ];
     }
 }
