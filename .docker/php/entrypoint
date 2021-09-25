@@ -1,0 +1,5 @@
+#!/bin/sh
+
+service cron start
+
+exec docker-php-entrypoint php-fpm
