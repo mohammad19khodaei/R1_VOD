@@ -7,6 +7,7 @@ use App\Enums\TransactionAmount;
 use App\Enums\TransactionType;
 use App\Transaction;
 use App\User;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -201,5 +202,42 @@ class ArticleCreateTest extends TestCase
         $response = $this->postJson('/api/articles', []);
 
         $response->assertStatus(401);
+    }
+
+    /** @test */
+    public function it_disable_user_if_charge_become_negative_after_create_article()
+    {
+        Mail::fake();
+        $this->loggedInUser->update(['charge' => 3000]);
+
+
+        $data = [
+            'article' => [
+                'title' => 'test title',
+                'description' => 'test description',
+                'body' => 'test body with random text',
+            ]
+        ];
+        $this->postJson('/api/articles', $data, $this->headers);
+
+        $user = User::query()->whereKey($this->loggedInUser->id)->first();
+        $this->assertNotNull($user->disabled_at);
+    }
+
+    /** @test */
+    public function it_return_forbidden_response_if_disabled_user_want_to_create_article()
+    {
+        User::unsetEventDispatcher();
+        $this->loggedInUser->update(['disabled_at' => now()]);
+
+        $data = [
+            'article' => [
+                'title' => 'test title',
+                'description' => 'test description',
+                'body' => 'test body with random text',
+            ]
+        ];
+        $this->postJson('/api/articles', $data, $this->headers)
+            ->assertStatus(403);
     }
 }

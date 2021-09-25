@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('image', 2048)->nullable();
             $table->integer('charge')->default(0);
             $table->rememberToken();
+            $table->timestamp('disabled_at')->nullable();
             $table->timestamps();
 
             $table->unique(['username', 'email']);

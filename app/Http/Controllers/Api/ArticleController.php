@@ -26,6 +26,7 @@ class ArticleController extends ApiController
 
         $this->middleware('auth.api')->except(['index', 'show']);
         $this->middleware('auth.api:optional')->only(['index', 'show']);
+        $this->middleware('check.user.status')->only(['store']);
     }
 
     /**
