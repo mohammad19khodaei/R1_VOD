@@ -10,7 +10,7 @@ class UserFactorTransformer extends Transformer
     {
         return [
             'product_id' => $data['product_id'],
-            'product_type' => $data['product_type'],
+            'product_type' => (new \ReflectionClass($data['product_type']))->getShortName(),
             'factor_number' => $data['factor_number'],
             'amount' => $data['transaction']['amount'],
         ];
