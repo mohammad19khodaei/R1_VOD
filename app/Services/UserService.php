@@ -28,17 +28,31 @@ class UserService
 
     public function chargeUser(User $user, int $amount)
     {
-        $user->update([
-            'charge' => DB::raw('charge + ' . $amount)
-        ]);
-        
-        // remove last notification in_progress status
-        $newCharge = $user->fresh()->charge;
-        if (
-            $newCharge > User::NOTIFY_USER_CHARGE_THRESHOLD &&
-            $lastNotification = $user->notifications()->where('in_progress', 1)->first()
-        ) {
-            $lastNotification->update(['in_progress' => 0]);
+        DB::beginTransaction();
+        try {
+            $newCharge = $user->charge + $amount;
+            $attributes = ['charge' => $newCharge];
+
+            if (
+                $newCharge > User::NOTIFY_USER_CHARGE_THRESHOLD &&
+                $lastNotification = $user->notifications()->where('in_progress', 1)->first()
+            ) {
+                $lastNotification->update(['in_progress' => 0]);
+            }
+
+            // enable user
+            if ($newCharge > 0 && $user->isDisabled()) {
+                $attributes['disabled_at'] = null;
+            }
+
+            (new TransactionService())->deposit($user, $amount);
+
+            $user->update($attributes);
+
+            DB::commit();
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+            DB::rollback();
         }
     }
 }
