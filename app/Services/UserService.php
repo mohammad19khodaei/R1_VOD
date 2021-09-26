@@ -30,12 +30,9 @@ class UserService
     {
         DB::beginTransaction();
         try {
-            $user->update([
-                'charge' => DB::raw('charge + ' . $amount)
-            ]);
+            $newCharge = $user->charge + $amount;
+            $attributes = ['charge' => $newCharge];
 
-            // remove last notification in_progress status
-            $newCharge = $user->fresh()->charge;
             if (
                 $newCharge > User::NOTIFY_USER_CHARGE_THRESHOLD &&
                 $lastNotification = $user->notifications()->where('in_progress', 1)->first()
@@ -45,10 +42,10 @@ class UserService
 
             // enable user
             if ($newCharge > 0 && $user->isDisabled()) {
-                $user->update([
-                    'disabled_at' => null,
-                ]);
+                $attributes['disabled_at'] = null;
             }
+
+            $user->update($attributes);
 
             DB::commit();
         } catch (\Exception $exception) {
