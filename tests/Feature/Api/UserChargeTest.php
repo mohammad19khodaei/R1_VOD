@@ -48,22 +48,4 @@ class UserChargeTest extends TestCase
                 ]
             ]);
     }
-
-    /** @test */
-    public function it_create_deposit_transaction_on_charge_account()
-    {
-        $dispatcher = User::getEventDispatcher();
-        User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => -1000, 'disabled_at' => now()]);
-        User::setEventDispatcher($dispatcher);
-
-        $data = ['amount' => 10000];
-        $this->postJson('/api/user/charge', $data, $this->headers);
-
-        $this->assertDatabaseHas('transactions', [
-            'user_id' => $this->loggedInUser->id,
-            'type' => TransactionType::DEPOSIT,
-            'amount' => $data['amount'],
-        ]);
-    }
 }
