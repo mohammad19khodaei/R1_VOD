@@ -17,3 +17,8 @@ To install the application please run the following commands
 You can log in to the application using following credentials
 * email: `admin@arvan.com`
 * password: `secret`
+
+## Database
+It's the structure of new tables
+
+![database](/home/mohammad/Downloads/arvan_vod_db.png)
