@@ -55,6 +55,6 @@ class UserController extends ApiController
         $user = auth()->user();
         (new UserService())->chargeUser($user, $request->get('amount'));
 
-        return $this->respondSuccess('Your account charged successfully');
+        return $this->respondSuccess();
     }
 }

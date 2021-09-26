@@ -47,4 +47,21 @@ class UserChargeTest extends TestCase
                 ]
             ]);
     }
+
+    /** @test */
+    public function it_enable_disabled_user_if_new_charge_is_greater_than_zero()
+    {
+        $dispatcher = User::getEventDispatcher();
+        User::unsetEventDispatcher();
+        $this->loggedInUser->update(['charge' => -1000, 'disabled_at' => now()]);
+        User::setEventDispatcher($dispatcher);
+
+        $data = ['amount' => 10000];
+        $this->postJson('/api/user/charge', $data, $this->headers);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $this->loggedInUser->id,
+            'disabled_at' => null,
+        ]);
+    }
 }
