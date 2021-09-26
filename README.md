@@ -21,4 +21,5 @@ You can log in to the application using following credentials
 ## Database
 It's the structure of new tables
 
-![database](/home/mohammad/Downloads/arvan_vod_db.png)
+![arvan_vod_db](https://user-images.githubusercontent.com/30317757/134793106-a06ee261-2148-412c-8489-6d5af350d0f5.png)
+
