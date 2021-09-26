@@ -45,6 +45,8 @@ class UserService
                 $attributes['disabled_at'] = null;
             }
 
+            (new TransactionService())->deposit($user, $amount);
+
             $user->update($attributes);
 
             DB::commit();

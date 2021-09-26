@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Enums\TransactionType;
 use App\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -49,7 +50,7 @@ class UserChargeTest extends TestCase
     }
 
     /** @test */
-    public function it_enable_disabled_user_if_new_charge_is_greater_than_zero()
+    public function it_create_deposit_transaction_on_charge_account()
     {
         $dispatcher = User::getEventDispatcher();
         User::unsetEventDispatcher();
@@ -59,9 +60,10 @@ class UserChargeTest extends TestCase
         $data = ['amount' => 10000];
         $this->postJson('/api/user/charge', $data, $this->headers);
 
-        $this->assertDatabaseHas('users', [
-            'id' => $this->loggedInUser->id,
-            'disabled_at' => null,
+        $this->assertDatabaseHas('transactions', [
+            'user_id' => $this->loggedInUser->id,
+            'type' => TransactionType::DEPOSIT,
+            'amount' => $data['amount'],
         ]);
     }
 }
