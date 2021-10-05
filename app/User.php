@@ -35,6 +35,10 @@ class User extends Authenticatable implements JWTSubject
         'password', 'remember_token',
     ];
 
+    protected $dates = [
+        'disabled_at'
+    ];
+
     /**
      * The event map for the model.
      *
@@ -170,5 +174,15 @@ class User extends Authenticatable implements JWTSubject
     public function isDisabled(): bool
     {
         return !is_null($this->disabled_at);
+    }
+
+    /**
+     * return true if the user disabled at more than 24 hour ago
+     *
+     * @return bool
+     */
+    public function mustRemove(): bool
+    {
+        return !is_null($this->disabled_at) && $this->disabled_at->addDay()->isPast();
     }
 }

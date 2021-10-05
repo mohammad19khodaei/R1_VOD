@@ -23,9 +23,7 @@ class TransactionService
         ]);
         $this->transaction = $newTransaction;
 
-        $user->update([
-            'charge' => DB::raw('charge + ' . $amount),
-        ]);
+        $user->increment('charge', $amount);
 
         return $this;
     }
