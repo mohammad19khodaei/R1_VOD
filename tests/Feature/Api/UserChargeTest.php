@@ -12,7 +12,7 @@ class UserChargeTest extends TestCase
     use RefreshDatabase;
 
     /** @test */
-    public function it_increase_user_charge_and_remove_in_progress_notification()
+    public function it_successfully_does_charge_user_account_proccess()
     {
         $dispatcher = User::getEventDispatcher();
         User::unsetEventDispatcher();
@@ -34,6 +34,10 @@ class UserChargeTest extends TestCase
             'user_id' => $userId,
             'in_progress' => 0,
         ]);
+        $this->assertDatabaseHas('transactions', [
+            'user_id' => $userId,
+            'amount' => $data['amount'],
+        ]);
     }
 
     /** @test */
@@ -47,23 +51,5 @@ class UserChargeTest extends TestCase
                     'amount' => ['must be at least 5000.']
                 ]
             ]);
-    }
-
-    /** @test */
-    public function it_create_deposit_transaction_on_charge_account()
-    {
-        $dispatcher = User::getEventDispatcher();
-        User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => -1000, 'disabled_at' => now()]);
-        User::setEventDispatcher($dispatcher);
-
-        $data = ['amount' => 10000];
-        $this->postJson('/api/user/charge', $data, $this->headers);
-
-        $this->assertDatabaseHas('transactions', [
-            'user_id' => $this->loggedInUser->id,
-            'type' => TransactionType::DEPOSIT,
-            'amount' => $data['amount'],
-        ]);
     }
 }
