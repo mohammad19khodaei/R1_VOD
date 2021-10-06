@@ -38,7 +38,7 @@ class ArticleService
 
         } catch (NotEnoughChargeException $exception) {
             DB::commit();
-            throw new NotEnoughChargeException();
+            throw $exception;
         } catch (\Exception $exception) {
             $article = null;
             Log::error($exception->getMessage());
