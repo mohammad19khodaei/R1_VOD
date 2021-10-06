@@ -54,3 +54,10 @@ $factory->define(App\Tag::class, function (\Faker\Generator $faker) {
         'name' => $faker->unique()->word,
     ];
 });
+
+$factory->define(App\Setting::class, function (\Faker\Generator $faker) {
+    return [
+        'name' => $faker->unique()->word,
+        'value' => random_int(1000, 10000)
+    ];
+});

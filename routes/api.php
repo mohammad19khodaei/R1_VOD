@@ -43,4 +43,9 @@ Route::group(['namespace' => 'Api'], function () {
 
     Route::get('tags', 'TagController@index');
 
+    Route::resource('settings', 'SettingController', [
+        'only' => [
+            'index', 'update'
+        ]
+    ]);
 });
