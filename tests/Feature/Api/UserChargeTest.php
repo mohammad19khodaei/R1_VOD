@@ -12,7 +12,7 @@ class UserChargeTest extends TestCase
     use RefreshDatabase;
 
     /** @test */
-    public function it_increase_user_charge_and_remove_in_progress_notification()
+    public function it_successfully_does_charge_user_account_proccess()
     {
         $dispatcher = User::getEventDispatcher();
         User::unsetEventDispatcher();
@@ -33,6 +33,10 @@ class UserChargeTest extends TestCase
         $this->assertDatabaseHas('notifications', [
             'user_id' => $userId,
             'in_progress' => 0,
+        ]);
+        $this->assertDatabaseHas('transactions', [
+            'user_id' => $userId,
+            'amount' => $data['amount'],
         ]);
     }
 

@@ -3,11 +3,9 @@
 namespace App\Services;
 
 use App\Contracts\ProductContract;
-use App\User;
-use App\Comment;
-use App\Article;
-use App\Transaction;
 use App\Enums\TransactionType;
+use App\Transaction;
+use App\User;
 use Illuminate\Support\Facades\DB;
 
 class TransactionService
@@ -23,9 +21,7 @@ class TransactionService
         ]);
         $this->transaction = $newTransaction;
 
-        $user->update([
-            'charge' => DB::raw('charge + ' . $amount),
-        ]);
+        $user->increment('charge', $amount);
 
         return $this;
     }

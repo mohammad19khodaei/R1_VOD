@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\UserUpdated;
+use App\Jobs\RemoveDisabledUserJob;
 use App\User;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,6 +28,7 @@ class DisableUserListener
         if ($original->isDirty('charge') && $charge < 0) {
             $user->disabled_at = now();
             $user->save();
+            dispatch(new RemoveDisabledUserJob($user))->delay(now()->addDay());
         }
     }
 }
