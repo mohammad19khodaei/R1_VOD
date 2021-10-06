@@ -15,7 +15,7 @@ class Setting extends Model
         return cache()->rememberForever("setting_{$key}", function () use ($key, $default) {
             $setting = self::query()->where('name', $key)->first();
 
-            return $setting ?: $default;
+            return $setting->value ?? $default;
         });
     }
 }

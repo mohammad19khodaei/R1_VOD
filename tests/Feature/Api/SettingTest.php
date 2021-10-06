@@ -18,17 +18,12 @@ class SettingTest extends TestCase
 
         $response = $this->getJson('api/settings', $this->headers);
         $response->assertStatus(200)
-            ->assertJson([
+            ->assertJsonStructure([
                 'settings' => [
-                    [
-                        'id' => $settings[0]['id'],
-                        'name' => $settings[0]['name'],
-                        'value' => $settings[0]['value'],
-                    ],
-                    [
-                        'id' => $settings[1]['id'],
-                        'name' => $settings[1]['name'],
-                        'value' => $settings[1]['value'],
+                    '*' => [
+                        'id',
+                        'name',
+                        'value'
                     ]
                 ]
             ]);

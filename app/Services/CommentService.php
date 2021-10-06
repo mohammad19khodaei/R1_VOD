@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use App\User;
 use App\Article;
 use App\Comment;
-use App\Enums\TransactionAmount;
+use App\Enums\TransactionKey;
+use App\Exceptions\NotEnoughChargeException;
+use App\Setting;
+use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Exceptions\NotEnoughChargeException;
 
 class CommentService
 {
@@ -32,7 +33,7 @@ class CommentService
 
             if ($commentCount >= Comment::MAX_NUMBER_OF_FREE_COMMENT) {
                 (new TransactionService())
-                    ->withdraw($user, TransactionAmount::COMMENT_CREATION_WITHDRAW)
+                    ->withdraw($user, Setting::get(TransactionKey::COMMENT_CREATION_WITHDRAW))
                     ->createFactor($comment);
             }
 

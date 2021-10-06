@@ -1,20 +1,21 @@
 <?php
 
+use App\Enums\TransactionKey;
 use Illuminate\Database\Seeder;
 
 class SettingsSeeder extends Seeder
 {
     protected array $settings = [
         [
-            'name' => 'registration_deposit',
+            'name' => TransactionKey::REGISTRATION_DEPOSIT,
             'value' => 100000,
         ],
         [
-            'name' => 'article_create_withdraw',
+            'name' => TransactionKey::ARTICLE_CREATION_WITHDRAW,
             'value' => 5000,
         ],
         [
-            'name' => 'registration_withdraw',
+            'name' => TransactionKey::COMMENT_CREATION_WITHDRAW,
             'value' => 5000,
         ],
     ];

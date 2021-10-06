@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\TransactionKey;
+use App\Setting;
 use App\User;
-use App\Enums\TransactionAmount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -16,7 +17,8 @@ class UserService
         try {
             $user = User::create($parameters);
 
-            (new TransactionService())->deposit($user, TransactionAmount::REGISTRATION_DEPOSIT);
+            (new TransactionService())
+                ->deposit($user, Setting::get(TransactionKey::REGISTRATION_DEPOSIT));
 
             DB::commit();
         } catch (\Exception $exception) {
