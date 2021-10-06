@@ -2,8 +2,9 @@
 
 namespace Tests;
 
-use App\Enums\TransactionAmount;
+use App\Enums\TransactionKey;
 use App\Services\TransactionService;
+use App\Setting;
 use App\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
@@ -21,11 +22,12 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        (new \DatabaseSeeder())->call(\SettingsSeeder::class);
         $users = factory(\App\User::class)->times(2)
             ->create()
             ->each(function (User $user) {
                 (new TransactionService())
-                    ->deposit($user, TransactionAmount::REGISTRATION_DEPOSIT);
+                    ->deposit($user, Setting::get(TransactionKey::REGISTRATION_DEPOSIT));
             });
 
         $this->loggedInUser = $users[0];

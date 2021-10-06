@@ -3,13 +3,14 @@
 namespace Tests\Feature\Api;
 
 use App\Comment;
-use App\Enums\TransactionAmount;
+use App\Enums\TransactionKey;
 use App\Enums\TransactionType;
+use App\Setting;
 use App\Transaction;
 use App\User;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class CommentTest extends TestCase
 {
@@ -150,7 +151,7 @@ class CommentTest extends TestCase
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->loggedInUser->id,
-            'amount' => TransactionAmount::COMMENT_CREATION_WITHDRAW,
+            'amount' => Setting::get(TransactionKey::COMMENT_CREATION_WITHDRAW),
             'type' => TransactionType::WITHDRAWAL,
         ]);
 

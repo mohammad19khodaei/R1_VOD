@@ -2,11 +2,12 @@
 
 namespace Tests\Feature\Api;
 
-use App\Enums\TransactionAmount;
+use App\Enums\TransactionKey;
 use App\Enums\TransactionType;
+use App\Setting;
 use App\User;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class RegistrationTest extends TestCase
 {
@@ -54,13 +55,13 @@ class RegistrationTest extends TestCase
         $this->assertDatabaseHas('users', [
             'username' => 'test',
             'email' => 'test@test.com',
-            'charge' => TransactionAmount::REGISTRATION_DEPOSIT
+            'charge' => Setting::get(TransactionKey::REGISTRATION_DEPOSIT)
         ]);
 
         $user = User::query()->latest('id')->first();
         $this->assertDatabaseHas('transactions', [
             'user_id' => $user->id,
-            'amount' => TransactionAmount::REGISTRATION_DEPOSIT,
+            'amount' => Setting::get(TransactionKey::REGISTRATION_DEPOSIT),
             'type' => TransactionType::DEPOSIT,
         ]);
     }

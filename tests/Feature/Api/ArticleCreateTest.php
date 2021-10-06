@@ -3,13 +3,14 @@
 namespace Tests\Feature\Api;
 
 use App\Article;
-use App\Enums\TransactionAmount;
+use App\Enums\TransactionKey;
 use App\Enums\TransactionType;
+use App\Setting;
 use App\Transaction;
 use App\User;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class ArticleCreateTest extends TestCase
 {
@@ -105,7 +106,7 @@ class ArticleCreateTest extends TestCase
         $this->assertDatabaseHas('users', [
             'username' => $this->loggedInUser->username,
             'email' => $this->loggedInUser->email,
-            'charge' => TransactionAmount::REGISTRATION_DEPOSIT - TransactionAmount::ARTICLE_CREATION_WITHDRAW
+            'charge' => Setting::get(TransactionKey::REGISTRATION_DEPOSIT) - Setting::get(TransactionKey::ARTICLE_CREATION_WITHDRAW)
         ]);
     }
 
@@ -124,7 +125,7 @@ class ArticleCreateTest extends TestCase
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->loggedInUser->id,
-            'amount' => TransactionAmount::ARTICLE_CREATION_WITHDRAW,
+            'amount' => Setting::get(TransactionKey::ARTICLE_CREATION_WITHDRAW),
             'type' => TransactionType::WITHDRAWAL,
         ]);
 
