@@ -21,7 +21,7 @@ class CommentService
             $commentCount = $user->comments()->lockForUpdate()->count();
 
             // check if the user can submit a comment
-            if ($user->charge < 0 && $commentCount >= Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT)) {
+            if ($user->charge < 0 && $commentCount >= setting(SettingKey::MAX_NUMBER_OF_FREE_COMMENT)) {
                 throw new NotEnoughChargeException();
             }
 
@@ -31,9 +31,9 @@ class CommentService
                 'user_id' => $user->id,
             ]);
 
-            if ($commentCount >= Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT)) {
+            if ($commentCount >= setting(SettingKey::MAX_NUMBER_OF_FREE_COMMENT)) {
                 (new TransactionService())
-                    ->withdraw($user, Setting::get(SettingKey::COMMENT_CREATION_WITHDRAW))
+                    ->withdraw($user, setting(SettingKey::COMMENT_CREATION_WITHDRAW))
                     ->createFactor($comment);
             }
 

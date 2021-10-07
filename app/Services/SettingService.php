@@ -10,8 +10,17 @@ class SettingService
     {
         $setting = tap($setting)->update($parameters);
 
-        cache()->forever("setting_{$setting->name}", $parameters['value']);
+        cache()->forget("setting_{$setting->name}");
 
         return $setting;
+    }
+
+    public function get(string $key, $default = null)
+    {
+        return cache()->rememberForever("setting_{$key}", function () use ($key, $default) {
+            $setting = Setting::query()->where('name', $key)->first();
+
+            return $setting->value ?? $default;
+        });
     }
 }

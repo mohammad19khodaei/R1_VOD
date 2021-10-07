@@ -32,7 +32,7 @@ class ArticleService
             /** @var Article $article */
             $article = $user->articles()->create($parameters);
             (new TransactionService())
-                ->withdraw($user, Setting::get(SettingKey::ARTICLE_CREATION_WITHDRAW))
+                ->withdraw($user, setting(SettingKey::ARTICLE_CREATION_WITHDRAW))
                 ->createFactor($article);
 
             DB::commit();

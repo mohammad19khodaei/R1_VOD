@@ -20,7 +20,7 @@ class UserFactorTest extends TestCase
         foreach ($articles as $articleData) {
             $article = $this->loggedInUser->articles()->create($articleData);
             (new TransactionService())
-                ->withdraw($this->loggedInUser, Setting::get(SettingKey::ARTICLE_CREATION_WITHDRAW))
+                ->withdraw($this->loggedInUser, setting(SettingKey::ARTICLE_CREATION_WITHDRAW))
                 ->createFactor($article);
         }
 

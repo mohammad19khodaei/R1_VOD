@@ -163,7 +163,7 @@ class User extends Authenticatable implements JWTSubject
     public function notifyIsRequired(): bool
     {
         $newCharge = optional($this->fresh())->getAttribute('charge');
-        return $newCharge < Setting::get(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) && !$this->isNotifiedBefore();
+        return $newCharge < setting(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) && !$this->isNotifiedBefore();
     }
 
     public function isNotifiedBefore(): bool
