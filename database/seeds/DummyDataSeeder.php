@@ -2,7 +2,6 @@
 
 use App\Enums\SettingKey;
 use App\Services\TransactionService;
-use App\Setting;
 use App\User;
 use Illuminate\Database\Seeder;
 
@@ -76,7 +75,7 @@ class DummyDataSeeder extends Seeder
         $users = factory(User::class)->times($this->totalUsers)
             ->create()
             ->each(function (User $user) {
-                (new TransactionService($user))->deposit(Setting::get(SettingKey::REGISTRATION_DEPOSIT));
+                (new TransactionService($user))->deposit(setting(SettingKey::REGISTRATION_DEPOSIT));
             });
 
         // a user for authentication
