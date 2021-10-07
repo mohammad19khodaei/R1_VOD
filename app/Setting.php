@@ -10,7 +10,7 @@ class Setting extends Model
 
     protected $fillable = ['name', 'value'];
 
-    public static function get(string $key, $default = null)
+    public static function get(string $key, $default = null): int
     {
         return cache()->rememberForever("setting_{$key}", function () use ($key, $default) {
             $setting = self::query()->where('name', $key)->first();

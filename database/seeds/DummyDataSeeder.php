@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\TransactionKey;
+use App\Enums\SettingKey;
 use App\Services\TransactionService;
 use App\Setting;
 use App\User;
@@ -77,7 +77,7 @@ class DummyDataSeeder extends Seeder
             ->create()
             ->each(function (User $user) {
                 (new TransactionService())
-                    ->deposit($user, Setting::get(TransactionKey::REGISTRATION_DEPOSIT));
+                    ->deposit($user, Setting::get(SettingKey::REGISTRATION_DEPOSIT));
             });
 
         // a user for authentication

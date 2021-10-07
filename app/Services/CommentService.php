@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Article;
 use App\Comment;
-use App\Enums\TransactionKey;
+use App\Enums\SettingKey;
 use App\Exceptions\NotEnoughChargeException;
 use App\Setting;
 use App\User;
@@ -21,7 +21,7 @@ class CommentService
             $commentCount = $user->comments()->lockForUpdate()->count();
 
             // check if the user can submit a comment
-            if ($commentCount >= Comment::MAX_NUMBER_OF_FREE_COMMENT && $user->charge < 0) {
+            if ($user->charge < 0 && $commentCount >= Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT)) {
                 throw new NotEnoughChargeException();
             }
 
@@ -31,9 +31,9 @@ class CommentService
                 'user_id' => $user->id,
             ]);
 
-            if ($commentCount >= Comment::MAX_NUMBER_OF_FREE_COMMENT) {
+            if ($commentCount >= Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT)) {
                 (new TransactionService())
-                    ->withdraw($user, Setting::get(TransactionKey::COMMENT_CREATION_WITHDRAW))
+                    ->withdraw($user, Setting::get(SettingKey::COMMENT_CREATION_WITHDRAW))
                     ->createFactor($comment);
             }
 

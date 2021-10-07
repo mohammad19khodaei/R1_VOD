@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Api;
 
-use App\Enums\TransactionKey;
+use App\Enums\SettingKey;
 use App\Enums\TransactionType;
 use App\Setting;
 use App\User;
@@ -55,13 +55,13 @@ class RegistrationTest extends TestCase
         $this->assertDatabaseHas('users', [
             'username' => 'test',
             'email' => 'test@test.com',
-            'charge' => Setting::get(TransactionKey::REGISTRATION_DEPOSIT)
+            'charge' => Setting::get(SettingKey::REGISTRATION_DEPOSIT)
         ]);
 
         $user = User::query()->latest('id')->first();
         $this->assertDatabaseHas('transactions', [
             'user_id' => $user->id,
-            'amount' => Setting::get(TransactionKey::REGISTRATION_DEPOSIT),
+            'amount' => Setting::get(SettingKey::REGISTRATION_DEPOSIT),
             'type' => TransactionType::DEPOSIT,
         ]);
     }

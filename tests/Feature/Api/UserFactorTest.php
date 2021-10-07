@@ -3,7 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Article;
-use App\Enums\TransactionKey;
+use App\Enums\SettingKey;
 use App\Services\TransactionService;
 use App\Setting;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -20,7 +20,7 @@ class UserFactorTest extends TestCase
         foreach ($articles as $articleData) {
             $article = $this->loggedInUser->articles()->create($articleData);
             (new TransactionService())
-                ->withdraw($this->loggedInUser, Setting::get(TransactionKey::ARTICLE_CREATION_WITHDRAW))
+                ->withdraw($this->loggedInUser, Setting::get(SettingKey::ARTICLE_CREATION_WITHDRAW))
                 ->createFactor($article);
         }
 

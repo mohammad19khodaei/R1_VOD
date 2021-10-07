@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\SettingKey;
 use App\Events\UserUpdated;
 use App\RealWorld\Follow\Followable;
 use App\RealWorld\Favorite\HasFavorite;
@@ -16,7 +17,6 @@ class User extends Authenticatable implements JWTSubject
 {
     use Followable, HasFavorite;
 
-    public const NOTIFY_USER_CHARGE_THRESHOLD = 20000;
     /**
      * The attributes that are mass assignable.
      *
@@ -163,7 +163,7 @@ class User extends Authenticatable implements JWTSubject
     public function notifyIsRequired(): bool
     {
         $newCharge = optional($this->fresh())->getAttribute('charge');
-        return $newCharge < self::NOTIFY_USER_CHARGE_THRESHOLD && !$this->isNotifiedBefore();
+        return $newCharge < Setting::get(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) && !$this->isNotifiedBefore();
     }
 
     public function isNotifiedBefore(): bool

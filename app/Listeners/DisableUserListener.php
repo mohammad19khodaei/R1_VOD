@@ -25,7 +25,7 @@ class DisableUserListener
         $user->syncOriginal();
 
         $charge = optional($user->fresh())->getAttribute('charge');
-        if ($original->isDirty('charge') && $charge < 0) {
+        if ($charge < 0 && $original->isDirty('charge')) {
             $user->disabled_at = now();
             $user->save();
             dispatch(new RemoveDisabledUserJob($user))->delay(now()->addDay());

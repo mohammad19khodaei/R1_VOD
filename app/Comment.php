@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model implements ProductContract
 {
-    public const MAX_NUMBER_OF_FREE_COMMENT = 5;
     /**
      * The attributes that are mass assignable.
      *

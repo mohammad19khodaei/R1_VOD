@@ -3,7 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Article;
-use App\Enums\TransactionKey;
+use App\Enums\SettingKey;
 use App\Enums\TransactionType;
 use App\Setting;
 use App\Transaction;
@@ -106,7 +106,7 @@ class ArticleCreateTest extends TestCase
         $this->assertDatabaseHas('users', [
             'username' => $this->loggedInUser->username,
             'email' => $this->loggedInUser->email,
-            'charge' => Setting::get(TransactionKey::REGISTRATION_DEPOSIT) - Setting::get(TransactionKey::ARTICLE_CREATION_WITHDRAW)
+            'charge' => Setting::get(SettingKey::REGISTRATION_DEPOSIT) - Setting::get(SettingKey::ARTICLE_CREATION_WITHDRAW)
         ]);
     }
 
@@ -125,7 +125,7 @@ class ArticleCreateTest extends TestCase
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->loggedInUser->id,
-            'amount' => Setting::get(TransactionKey::ARTICLE_CREATION_WITHDRAW),
+            'amount' => Setting::get(SettingKey::ARTICLE_CREATION_WITHDRAW),
             'type' => TransactionType::WITHDRAWAL,
         ]);
 
