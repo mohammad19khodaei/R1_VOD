@@ -3,7 +3,9 @@
 namespace Tests\Feature\Api;
 
 use App\Comment;
+use App\Enums\SettingKey;
 use App\Mail\LowUserCharge;
+use App\Setting;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Mail;
@@ -136,7 +138,7 @@ class LowChargeEmailTest extends TestCase
             ->comments()
             ->saveMany(
                 factory(Comment::class)
-                    ->times(Comment::MAX_NUMBER_OF_FREE_COMMENT)
+                    ->times(Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT))
                     ->make(['user_id' => $this->loggedInUser->id])
             );
 
@@ -168,7 +170,7 @@ class LowChargeEmailTest extends TestCase
             ->comments()
             ->saveMany(
                 factory(Comment::class)
-                    ->times(Comment::MAX_NUMBER_OF_FREE_COMMENT - 1)
+                    ->times(Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT) - 1)
                     ->make(['user_id' => $this->loggedInUser->id])
             );
 

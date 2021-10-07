@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\TransactionKey;
+use App\Enums\SettingKey;
 use App\Setting;
 use App\User;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +18,7 @@ class UserService
             $user = User::create($parameters);
 
             (new TransactionService())
-                ->deposit($user, Setting::get(TransactionKey::REGISTRATION_DEPOSIT));
+                ->deposit($user, Setting::get(SettingKey::REGISTRATION_DEPOSIT));
 
             DB::commit();
         } catch (\Exception $exception) {
@@ -36,7 +36,7 @@ class UserService
             $attributes = ['charge' => $newCharge];
 
             if (
-                $newCharge > User::NOTIFY_USER_CHARGE_THRESHOLD &&
+                $newCharge > Setting::get(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) &&
                 $lastNotification = $user->notifications()->where('in_progress', 1)->first()
             ) {
                 $lastNotification->update(['in_progress' => 0]);

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Comment;
-use App\Enums\TransactionKey;
+use App\Enums\SettingKey;
 use App\Enums\TransactionType;
 use App\Setting;
 use App\Transaction;
@@ -35,7 +35,7 @@ class CommentTest extends TestCase
             ->comments()
             ->saveMany(
                 factory(\App\Comment::class)
-                    ->times(Comment::MAX_NUMBER_OF_FREE_COMMENT - 1)
+                    ->times(Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT) - 1)
                     ->make(['user_id' => $this->loggedInUser->id])
             );
 
@@ -62,7 +62,7 @@ class CommentTest extends TestCase
             ->comments()
             ->saveMany(
                 factory(\App\Comment::class)
-                    ->times(Comment::MAX_NUMBER_OF_FREE_COMMENT)
+                    ->times(Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT))
                     ->make(['user_id' => $this->loggedInUser->id])
             );
 
@@ -88,7 +88,7 @@ class CommentTest extends TestCase
             ->comments()
             ->saveMany(
                 factory(\App\Comment::class)
-                    ->times(Comment::MAX_NUMBER_OF_FREE_COMMENT)
+                    ->times(Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT))
                     ->make(['user_id' => $this->loggedInUser->id])
             );
         $data = [
@@ -151,7 +151,7 @@ class CommentTest extends TestCase
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->loggedInUser->id,
-            'amount' => Setting::get(TransactionKey::COMMENT_CREATION_WITHDRAW),
+            'amount' => Setting::get(SettingKey::COMMENT_CREATION_WITHDRAW),
             'type' => TransactionType::WITHDRAWAL,
         ]);
 
@@ -266,7 +266,7 @@ class CommentTest extends TestCase
             ->comments()
             ->saveMany(
                 factory(\App\Comment::class)
-                    ->times(Comment::MAX_NUMBER_OF_FREE_COMMENT)
+                    ->times(Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT))
                     ->make(['user_id' => $this->loggedInUser->id])
             );
 
