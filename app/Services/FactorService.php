@@ -17,7 +17,7 @@ class FactorService
     public function create(ProductContract $product)
     {
         return $this->transaction->factors()->create([
-            'factor_number' => '',
+            'factor_number' => uniqid('R1_', false),
             'product_id' => $product->id,
             'product_type' => get_class($product),
         ]);
