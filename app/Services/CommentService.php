@@ -6,22 +6,26 @@ use App\Article;
 use App\Comment;
 use App\Enums\SettingKey;
 use App\Exceptions\NotEnoughChargeException;
-use App\Setting;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CommentService
 {
+    /**
+     * @param Article $article
+     * @param User $user
+     * @param string $body
+     * @return Comment|null
+     * @throws NotEnoughChargeException
+     */
     public function addComment(Article $article, User $user, string $body): ?Comment
     {
-        $comment = null;
         DB::beginTransaction();
-        try {
-            $commentCount = $user->comments()->lockForUpdate()->count();
+        $commentCount = $user->comments()->lockForUpdate()->count();
 
-            // check if the user can submit a comment
-            if ($user->charge < 0 && $commentCount >= setting(SettingKey::MAX_NUMBER_OF_FREE_COMMENT)) {
+        try {
+            if (!(new UserChargeService($user))->canSubmitComment($commentCount)) {
                 throw new NotEnoughChargeException();
             }
 
@@ -32,15 +36,15 @@ class CommentService
             ]);
 
             if ($commentCount >= setting(SettingKey::MAX_NUMBER_OF_FREE_COMMENT)) {
-                (new TransactionService())
-                    ->withdraw($user, setting(SettingKey::COMMENT_CREATION_WITHDRAW))
-                    ->createFactor($comment);
+                $transaction = (new TransactionService($user))
+                    ->withdraw(setting(SettingKey::COMMENT_CREATION_WITHDRAW));
+                (new FactorService($transaction))->create($comment);
             }
 
             DB::commit();
         } catch (NotEnoughChargeException $exception) {
             DB::commit();
-            throw new NotEnoughChargeException();
+            throw $exception;
         } catch (\Exception $exception) {
             $comment = null;
             Log::error($exception->getMessage());

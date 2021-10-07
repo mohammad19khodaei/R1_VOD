@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Article;
 use App\Enums\SettingKey;
 use App\Exceptions\NotEnoughChargeException;
-use App\Setting;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,23 +19,22 @@ class ArticleService
      */
     public function createArticle(int $userId, array $parameters): ?Article
     {
-        $article = null;
         DB::beginTransaction();
         /** @var User $user */
         $user = User::query()->lockForUpdate()->whereKey($userId)->first();
+
         try {
-            if ($user->charge < 0) {
+            if (!(new UserChargeService($user))->canSubmitArticle()) {
                 throw new NotEnoughChargeException();
             }
 
             /** @var Article $article */
             $article = $user->articles()->create($parameters);
-            (new TransactionService())
-                ->withdraw($user, setting(SettingKey::ARTICLE_CREATION_WITHDRAW))
-                ->createFactor($article);
+
+            $transaction = (new TransactionService($user))->withdraw(setting(SettingKey::ARTICLE_CREATION_WITHDRAW));
+            (new FactorService($transaction))->create($article);
 
             DB::commit();
-
         } catch (NotEnoughChargeException $exception) {
             DB::commit();
             throw $exception;

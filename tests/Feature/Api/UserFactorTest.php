@@ -4,8 +4,8 @@ namespace Tests\Feature\Api;
 
 use App\Article;
 use App\Enums\SettingKey;
+use App\Services\FactorService;
 use App\Services\TransactionService;
-use App\Setting;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -19,9 +19,9 @@ class UserFactorTest extends TestCase
         $articles = factory(Article::class)->times(2)->raw();
         foreach ($articles as $articleData) {
             $article = $this->loggedInUser->articles()->create($articleData);
-            (new TransactionService())
-                ->withdraw($this->loggedInUser, setting(SettingKey::ARTICLE_CREATION_WITHDRAW))
-                ->createFactor($article);
+            $transaction = (new TransactionService($this->loggedInUser))
+                ->withdraw(setting(SettingKey::ARTICLE_CREATION_WITHDRAW));
+            (new FactorService($transaction))->create($article);
         }
 
         $factors = $this->loggedInUser->factors()->with('transaction')->get();

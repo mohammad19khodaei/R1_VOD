@@ -2,10 +2,9 @@
 
 namespace App;
 
-use App\Enums\SettingKey;
 use App\Events\UserUpdated;
-use App\RealWorld\Follow\Followable;
 use App\RealWorld\Favorite\HasFavorite;
+use App\RealWorld\Follow\Followable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -158,12 +157,6 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [];
-    }
-
-    public function notifyIsRequired(): bool
-    {
-        $newCharge = optional($this->fresh())->getAttribute('charge');
-        return $newCharge < setting(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) && !$this->isNotifiedBefore();
     }
 
     public function isNotifiedBefore(): bool

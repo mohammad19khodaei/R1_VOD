@@ -2,65 +2,41 @@
 
 namespace App\Services;
 
-use App\Contracts\ProductContract;
 use App\Enums\TransactionType;
 use App\Transaction;
 use App\User;
-use Illuminate\Support\Facades\DB;
 
 class TransactionService
 {
     protected Transaction $transaction;
 
-    public function deposit(User $user, int $amount): self
+    protected User $user;
+
+    public function __construct(User $user)
     {
-        /** @var Transaction $newTransaction */
-        $newTransaction = $user->transactions()->create([
+        $this->user = $user;
+    }
+
+    public function deposit(int $amount): void
+    {
+        $this->user->transactions()->create([
             'type' => TransactionType::DEPOSIT,
             'amount' => $amount,
         ]);
-        $this->transaction = $newTransaction;
 
-        $user->increment('charge', $amount);
-
-        return $this;
+        (new UserChargeService($this->user))->increase($amount);
     }
 
-    public function withdraw(User $user, int $amount)
+    public function withdraw(int $amount): Transaction
     {
-        /** @var Transaction $newTransaction */
-        $newTransaction = $user->transactions()->create([
+        /** @var Transaction $transaction */
+        $transaction = $this->user->transactions()->create([
             'type' => TransactionType::WITHDRAWAL,
             'amount' => $amount,
         ]);
-        $this->transaction = $newTransaction;
 
-        $user->update([
-            'charge' => DB::raw('charge - ' . $amount),
-        ]);
+        (new UserChargeService($this->user))->decrease($amount);
 
-        return $this;
-    }
-
-    /**
-     * @param ProductContract $product
-     * @throws \Exception
-     */
-    public function createFactor(ProductContract $product): void
-    {
-        $this->checkTransaction();
-
-        $this->transaction->factors()->create([
-            'factor_number' => bin2hex(random_bytes(10)),
-            'product_id' => $product->id,
-            'product_type' => get_class($product),
-        ]);
-    }
-
-    protected function checkTransaction(): void
-    {
-        if (is_null($this->transaction)) {
-            throw new \Exception('Factor only can be created for a transaction');
-        }
+        return $transaction;
     }
 }
