@@ -12,34 +12,30 @@ class TransactionService
 {
     protected Transaction $transaction;
 
-    public function deposit(User $user, int $amount): self
+    public function deposit(User $user, int $amount): Transaction
     {
-        /** @var Transaction $newTransaction */
-        $newTransaction = $user->transactions()->create([
+        /** @var Transaction $transaction */
+        $transaction = $user->transactions()->create([
             'type' => TransactionType::DEPOSIT,
             'amount' => $amount,
         ]);
-        $this->transaction = $newTransaction;
 
-        $user->increment('charge', $amount);
+        (new UserChargeService($user))->increase($amount);
 
-        return $this;
+        return $transaction;
     }
 
-    public function withdraw(User $user, int $amount)
+    public function withdraw(User $user, int $amount): Transaction
     {
-        /** @var Transaction $newTransaction */
-        $newTransaction = $user->transactions()->create([
+        /** @var Transaction $transaction */
+        $transaction = $user->transactions()->create([
             'type' => TransactionType::WITHDRAWAL,
             'amount' => $amount,
         ]);
-        $this->transaction = $newTransaction;
 
-        $user->update([
-            'charge' => DB::raw('charge - ' . $amount),
-        ]);
+        (new UserChargeService($user))->decrease($amount);
 
-        return $this;
+        return $transaction;
     }
 
     /**
