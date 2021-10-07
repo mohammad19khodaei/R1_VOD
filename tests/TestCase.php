@@ -24,7 +24,7 @@ abstract class TestCase extends BaseTestCase
 
         (new \DatabaseSeeder())->call(\SettingsSeeder::class);
         $users = factory(\App\User::class)->times(2)
-            ->create()
+            ->create(['is_admin' => 1])
             ->each(function (User $user) {
                 (new TransactionService())
                     ->deposit($user, Setting::get(SettingKey::REGISTRATION_DEPOSIT));

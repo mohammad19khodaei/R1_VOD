@@ -19,6 +19,7 @@ $factory->define(App\User::class, function (\Faker\Generator $faker) {
         'password' => 'secret',
         'bio' => $faker->sentence,
         'image' => 'https://picsum.photos/200',
+        'is_admin' => false,
     ];
 });
 
