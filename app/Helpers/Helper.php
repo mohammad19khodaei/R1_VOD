@@ -1,6 +1,6 @@
 <?php
 
-if (! function_exists('remove_words')) {
+if (!function_exists('remove_words')) {
     /**
      * Remove words from the start of a string.
      *
@@ -11,9 +11,24 @@ if (! function_exists('remove_words')) {
     function remove_words($text, $count = 1)
     {
         if (str_word_count($text) > $count) {
-            return explode (' ', $text, $count + 1)[$count];
+            return explode(' ', $text, $count + 1)[$count];
         }
 
         return '';
+    }
+}
+
+if (!function_exists('setting')) {
+
+    /**
+     * fetch setting value
+     *
+     * @param $key
+     * @param null $default
+     * @return mixed
+     */
+    function setting($key, $default = null)
+    {
+        return app(\App\Services\SettingService::class)->get($key, $default);
     }
 }

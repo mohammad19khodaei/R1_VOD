@@ -18,7 +18,7 @@ class UserService
             $user = User::create($parameters);
 
             (new TransactionService())
-                ->deposit($user, Setting::get(SettingKey::REGISTRATION_DEPOSIT));
+                ->deposit($user, setting(SettingKey::REGISTRATION_DEPOSIT));
 
             DB::commit();
         } catch (\Exception $exception) {
@@ -36,7 +36,7 @@ class UserService
             $attributes = ['charge' => $newCharge];
 
             if (
-                $newCharge > Setting::get(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) &&
+                $newCharge > setting(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) &&
                 $lastNotification = $user->notifications()->where('in_progress', 1)->first()
             ) {
                 $lastNotification->update(['in_progress' => 0]);

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\SettingService;
 use Schema;
 use Illuminate\Support\ServiceProvider;
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
@@ -16,6 +17,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
+        app()->singleton(SettingService::class, function () {
+            return new SettingService();
+        });
     }
 
     /**

@@ -87,11 +87,11 @@ class SettingTest extends TestCase
             ->with("setting_{$setting->name}", \Closure::class)
             ->andReturn($setting->value);
 
-        Setting::get($setting->name);
+        setting($setting->name);
     }
 
     /** @test */
-    public function it_update_cache_value_on_update()
+    public function it_remove_cache_value_on_update()
     {
         $setting = factory(Setting::class)->create();
 
@@ -100,15 +100,15 @@ class SettingTest extends TestCase
             ->with("setting_{$setting->name}", \Closure::class)
             ->andReturn($setting->value);
 
-        Setting::get($setting->name);
+        setting($setting->name);
 
         $data = [
             'value' => 20000
         ];
 
-        Cache::shouldReceive('forever')
+        Cache::shouldReceive('forget')
             ->once()
-            ->with("setting_{$setting->name}", $data['value']);
+            ->with("setting_{$setting->name}");
 
         $this->patchJson("api/settings/{$setting->id}", $data, $this->headers)->assertStatus(200);
     }

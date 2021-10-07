@@ -138,7 +138,7 @@ class LowChargeEmailTest extends TestCase
             ->comments()
             ->saveMany(
                 factory(Comment::class)
-                    ->times(Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT))
+                    ->times(setting(SettingKey::MAX_NUMBER_OF_FREE_COMMENT))
                     ->make(['user_id' => $this->loggedInUser->id])
             );
 
@@ -170,7 +170,7 @@ class LowChargeEmailTest extends TestCase
             ->comments()
             ->saveMany(
                 factory(Comment::class)
-                    ->times(Setting::get(SettingKey::MAX_NUMBER_OF_FREE_COMMENT) - 1)
+                    ->times(setting(SettingKey::MAX_NUMBER_OF_FREE_COMMENT) - 1)
                     ->make(['user_id' => $this->loggedInUser->id])
             );
 

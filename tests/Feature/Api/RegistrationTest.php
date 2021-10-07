@@ -55,13 +55,13 @@ class RegistrationTest extends TestCase
         $this->assertDatabaseHas('users', [
             'username' => 'test',
             'email' => 'test@test.com',
-            'charge' => Setting::get(SettingKey::REGISTRATION_DEPOSIT)
+            'charge' => setting(SettingKey::REGISTRATION_DEPOSIT)
         ]);
 
         $user = User::query()->latest('id')->first();
         $this->assertDatabaseHas('transactions', [
             'user_id' => $user->id,
-            'amount' => Setting::get(SettingKey::REGISTRATION_DEPOSIT),
+            'amount' => setting(SettingKey::REGISTRATION_DEPOSIT),
             'type' => TransactionType::DEPOSIT,
         ]);
     }

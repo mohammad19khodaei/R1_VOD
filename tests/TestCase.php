@@ -27,7 +27,7 @@ abstract class TestCase extends BaseTestCase
             ->create(['is_admin' => 1])
             ->each(function (User $user) {
                 (new TransactionService())
-                    ->deposit($user, Setting::get(SettingKey::REGISTRATION_DEPOSIT));
+                    ->deposit($user, setting(SettingKey::REGISTRATION_DEPOSIT));
             });
 
         $this->loggedInUser = $users[0];

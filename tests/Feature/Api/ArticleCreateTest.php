@@ -106,7 +106,7 @@ class ArticleCreateTest extends TestCase
         $this->assertDatabaseHas('users', [
             'username' => $this->loggedInUser->username,
             'email' => $this->loggedInUser->email,
-            'charge' => Setting::get(SettingKey::REGISTRATION_DEPOSIT) - Setting::get(SettingKey::ARTICLE_CREATION_WITHDRAW)
+            'charge' => setting(SettingKey::REGISTRATION_DEPOSIT) - setting(SettingKey::ARTICLE_CREATION_WITHDRAW)
         ]);
     }
 
@@ -125,7 +125,7 @@ class ArticleCreateTest extends TestCase
 
         $this->assertDatabaseHas('transactions', [
             'user_id' => $this->loggedInUser->id,
-            'amount' => Setting::get(SettingKey::ARTICLE_CREATION_WITHDRAW),
+            'amount' => setting(SettingKey::ARTICLE_CREATION_WITHDRAW),
             'type' => TransactionType::WITHDRAWAL,
         ]);
 
