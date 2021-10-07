@@ -23,7 +23,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'password', 'bio', 'image', 'charge', 'disabled_at'
+        'username', 'email', 'password', 'bio', 'image', 'charge', 'disabled_at', 'is_admin'
     ];
 
     /**
@@ -184,5 +184,10 @@ class User extends Authenticatable implements JWTSubject
     public function mustRemove(): bool
     {
         return !is_null($this->disabled_at) && $this->disabled_at->addDay()->isPast();
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->is_admin;
     }
 }

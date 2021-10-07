@@ -13,7 +13,7 @@ class UpdateSetting extends ApiRequest
     public function rules()
     {
         return [
-            'value' => ['required']
+            'value' => ['required', 'integer']
         ];
     }
 }

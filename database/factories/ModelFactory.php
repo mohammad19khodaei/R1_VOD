@@ -18,7 +18,8 @@ $factory->define(App\User::class, function (\Faker\Generator $faker) {
         'email' => $faker->unique()->safeEmail,
         'password' => 'secret',
         'bio' => $faker->sentence,
-        'image' => 'https://cdn.worldvectorlogo.com/logos/laravel.svg',
+        'image' => 'https://picsum.photos/200',
+        'is_admin' => false,
     ];
 });
 

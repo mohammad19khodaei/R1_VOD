@@ -12,7 +12,7 @@ class SettingController extends ApiController
     public function __construct(SettingTransformer $transformer)
     {
         $this->transformer = $transformer;
-        $this->middleware('auth.api');
+        $this->middleware(['auth.api', 'check.user.is.admin']);
     }
 
     public function index()

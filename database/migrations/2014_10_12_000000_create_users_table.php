@@ -21,6 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('bio')->nullable();
             $table->string('image', 2048)->nullable();
             $table->integer('charge')->default(0);
+            $table->boolean('is_admin')->default(0);
             $table->rememberToken();
             $table->timestamp('disabled_at')->nullable();
             $table->timestamps();

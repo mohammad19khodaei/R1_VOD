@@ -59,5 +59,6 @@ class Kernel extends HttpKernel
         'auth.api' => \App\Http\Middleware\AuthenticateWithJWT::class,
         'cors' => \Barryvdh\Cors\HandleCors::class,
         'check.user.status' => \App\Http\Middleware\CheckUserStatus::class,
+        'check.user.is.admin' => \App\Http\Middleware\CheckUserIsAdmin::class,
     ];
 }
