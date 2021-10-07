@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Article;
 use App\Enums\SettingKey;
 use App\Exceptions\NotEnoughChargeException;
-use App\Setting;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +31,7 @@ class ArticleService
             /** @var Article $article */
             $article = $user->articles()->create($parameters);
 
-            $transaction = (new TransactionService())->withdraw($user, setting(SettingKey::ARTICLE_CREATION_WITHDRAW));
+            $transaction = (new TransactionService($user))->withdraw(setting(SettingKey::ARTICLE_CREATION_WITHDRAW));
             (new FactorService($transaction))->create($article);
 
             DB::commit();

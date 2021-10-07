@@ -76,8 +76,7 @@ class DummyDataSeeder extends Seeder
         $users = factory(User::class)->times($this->totalUsers)
             ->create()
             ->each(function (User $user) {
-                (new TransactionService())
-                    ->deposit($user, Setting::get(SettingKey::REGISTRATION_DEPOSIT));
+                (new TransactionService($user))->deposit(Setting::get(SettingKey::REGISTRATION_DEPOSIT));
             });
 
         // a user for authentication

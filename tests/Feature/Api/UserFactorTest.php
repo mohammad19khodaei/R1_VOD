@@ -19,8 +19,8 @@ class UserFactorTest extends TestCase
         $articles = factory(Article::class)->times(2)->raw();
         foreach ($articles as $articleData) {
             $article = $this->loggedInUser->articles()->create($articleData);
-            $transaction = (new TransactionService())
-                ->withdraw($this->loggedInUser, setting(SettingKey::ARTICLE_CREATION_WITHDRAW));
+            $transaction = (new TransactionService($this->loggedInUser))
+                ->withdraw(setting(SettingKey::ARTICLE_CREATION_WITHDRAW));
             (new FactorService($transaction))->create($article);
         }
 

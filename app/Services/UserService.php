@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\SettingKey;
-use App\Setting;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,8 +16,7 @@ class UserService
         try {
             $user = User::create($parameters);
 
-            (new TransactionService())
-                ->deposit($user, setting(SettingKey::REGISTRATION_DEPOSIT));
+            (new TransactionService($user))->deposit(setting(SettingKey::REGISTRATION_DEPOSIT));
 
             DB::commit();
         } catch (\Exception $exception) {
@@ -47,7 +45,7 @@ class UserService
                 $attributes['disabled_at'] = null;
             }
 
-            (new TransactionService())->deposit($user, $amount);
+            (new TransactionService($user))->deposit($amount);
 
             $user->update($attributes);
 

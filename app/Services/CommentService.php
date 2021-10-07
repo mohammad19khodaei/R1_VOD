@@ -6,7 +6,6 @@ use App\Article;
 use App\Comment;
 use App\Enums\SettingKey;
 use App\Exceptions\NotEnoughChargeException;
-use App\Setting;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -37,8 +36,8 @@ class CommentService
             ]);
 
             if ($commentCount >= setting(SettingKey::MAX_NUMBER_OF_FREE_COMMENT)) {
-                $transaction = (new TransactionService())
-                    ->withdraw($user, setting(SettingKey::COMMENT_CREATION_WITHDRAW));
+                $transaction = (new TransactionService($user))
+                    ->withdraw(setting(SettingKey::COMMENT_CREATION_WITHDRAW));
                 (new FactorService($transaction))->create($comment);
             }
 
