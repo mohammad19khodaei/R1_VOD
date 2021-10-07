@@ -83,7 +83,8 @@ class DummyDataSeeder extends Seeder
         // a user for authentication
         $users->first()->update([
             'username' => 'admin',
-            'email' => 'admin@arvan.com'
+            'email' => 'admin@arvan.com',
+            'is_admin' => true,
         ]);
 
         $tags = factory(\App\Tag::class)->times($this->totalTags)->create();
