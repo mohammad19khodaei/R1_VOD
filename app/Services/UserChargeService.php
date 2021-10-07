@@ -35,6 +35,12 @@ class UserChargeService
         $this->user->update([
             'charge' => DB::raw('charge - ' . $amount),
         ]);
-        $this->user = $this->user->fresh();
+    }
+
+    public function notifyIsRequired(): bool
+    {
+        $newCharge = optional($this->user->fresh())->getAttribute('charge');
+        return $newCharge < setting(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) &&
+            !$this->user->isNotifiedBefore();
     }
 }
