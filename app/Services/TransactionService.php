@@ -17,7 +17,7 @@ class TransactionService
         $this->user = $user;
     }
 
-    public function deposit(int $amount): Transaction
+    public function deposit(int $amount): void
     {
         /** @var Transaction $transaction */
         $transaction = $this->user->transactions()->create([
@@ -26,8 +26,6 @@ class TransactionService
         ]);
 
         (new UserChargeService($this->user))->increase($amount);
-
-        return $transaction;
     }
 
     public function withdraw(int $amount): Transaction
