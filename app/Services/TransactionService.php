@@ -19,8 +19,7 @@ class TransactionService
 
     public function deposit(int $amount): void
     {
-        /** @var Transaction $transaction */
-        $transaction = $this->user->transactions()->create([
+        $this->user->transactions()->create([
             'type' => TransactionType::DEPOSIT,
             'amount' => $amount,
         ]);
