@@ -108,7 +108,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
-     * Get all the notifications of the following users.
+     * Get all the email histories of the following users.
      *
      * @return HasMany
      */

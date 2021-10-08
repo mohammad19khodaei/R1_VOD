@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\SettingKey;
 use App\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UserChargeService
 {
@@ -42,5 +43,31 @@ class UserChargeService
         $newCharge = optional($this->user->fresh())->getAttribute('charge');
         return $newCharge < setting(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) &&
             !$this->user->isNotifiedBefore();
+    }
+
+    public function chargeUser(int $amount): void
+    {
+        DB::beginTransaction();
+        try {
+            $newCharge = $this->user->charge + $amount;
+            $attributes = ['charge' => $newCharge];
+
+            (new EmailHistoryService())->removeLastInProgress($this->user, $newCharge);
+
+
+            // enable user
+            if ($newCharge > 0 && $this->user->isDisabled()) {
+                $attributes['disabled_at'] = null;
+            }
+
+            (new TransactionService($this->user))->deposit($amount);
+
+            $this->user->update($attributes);
+
+            DB::commit();
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+            DB::rollback();
+        }
     }
 }
