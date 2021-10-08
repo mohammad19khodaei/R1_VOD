@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\Api\ChargeUser;
 use App\Http\Requests\Api\UpdateUser;
 use App\RealWorld\Transformers\UserTransformer;
-use App\Services\UserService;
+use App\Services\UserChargeService;
 use App\User;
 
 class UserController extends ApiController
@@ -53,7 +53,7 @@ class UserController extends ApiController
     {
         /** @var User $user */
         $user = auth()->user();
-        (new UserService())->chargeUser($user, $request->get('amount'));
+        (new UserChargeService($user))->chargeUser($request->get('amount'));
 
         return $this->respondSuccess();
     }

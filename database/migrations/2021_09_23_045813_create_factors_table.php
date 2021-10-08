@@ -16,7 +16,7 @@ class CreateFactorsTable extends Migration
         Schema::create('factors', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('transaction_id');
-            $table->string('factor_number');
+            $table->string('factor_number')->unique();
             $table->morphs('product');
             $table->timestamps();
 

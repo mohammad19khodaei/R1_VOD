@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Notification extends Model
+class EmailHistory extends Model
 {
     protected $fillable = ['in_progress'];
 }
