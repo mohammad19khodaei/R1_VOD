@@ -45,8 +45,9 @@ class UserChargeService
             !$this->user->isNotifiedBefore();
     }
 
-    public function chargeUser(int $amount): void
+    public function chargeUser(int $amount): User
     {
+        $user = null;
         DB::beginTransaction();
         try {
             $newCharge = $this->user->charge + $amount;
@@ -62,12 +63,13 @@ class UserChargeService
 
             (new TransactionService($this->user))->deposit($amount);
 
-            $this->user->update($attributes);
-
             DB::commit();
+            $user = tap($this->user)->update($attributes);
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
             DB::rollback();
         }
+
+        return $user;
     }
 }

@@ -53,8 +53,12 @@ class UserController extends ApiController
     {
         /** @var User $user */
         $user = auth()->user();
-        (new UserChargeService($user))->chargeUser($request->get('amount'));
+        $user = (new UserChargeService($user))->chargeUser($request->get('amount'));
 
-        return $this->respondSuccess();
+        if ($user === null) {
+            return $this->respondInternalError();
+        }
+
+        return $this->respondWithTransformer($user);
     }
 }
