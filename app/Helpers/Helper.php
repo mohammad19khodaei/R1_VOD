@@ -24,10 +24,10 @@ if (!function_exists('setting')) {
      * fetch setting value
      *
      * @param $key
-     * @param null $default
+     * @param int $default
      * @return mixed
      */
-    function setting($key, $default = null)
+    function setting($key, int $default = 0)
     {
         return app(\App\Services\SettingService::class)->get($key, $default);
     }
