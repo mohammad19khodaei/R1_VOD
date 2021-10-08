@@ -23,11 +23,11 @@ if (!function_exists('setting')) {
     /**
      * fetch setting value
      *
-     * @param $key
-     * @param int $default
+     * @param string $key
+     * @param $default
      * @return mixed
      */
-    function setting($key, int $default = 0)
+    function setting(string $key, $default = null)
     {
         return app(\App\Services\SettingService::class)->get($key, $default);
     }

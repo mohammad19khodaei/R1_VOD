@@ -15,7 +15,7 @@ class SettingService
         return $setting;
     }
 
-    public function get(string $key, int $default = 0): int
+    public function get(string $key, $default = null)
     {
         return cache()->rememberForever("setting_{$key}", function () use ($key, $default) {
             $setting = Setting::query()->where('name', $key)->first();
