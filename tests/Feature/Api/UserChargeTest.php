@@ -19,7 +19,7 @@ class UserChargeTest extends TestCase
         $this->loggedInUser->update(['charge' => 19000]);
         User::setEventDispatcher($dispatcher);
 
-        $this->loggedInUser->notifications()->create();
+        $this->loggedInUser->emailHistories()->create();
 
         $data = ['amount' => 10000];
         $this->postJson('/api/user/charge', $data, $this->headers)
@@ -30,7 +30,7 @@ class UserChargeTest extends TestCase
             'id' => $userId,
             'charge' => 19000 + 10000,
         ]);
-        $this->assertDatabaseHas('notifications', [
+        $this->assertDatabaseHas('email_histories', [
             'user_id' => $userId,
             'in_progress' => 0,
         ]);

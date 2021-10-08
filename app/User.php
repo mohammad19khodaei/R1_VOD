@@ -112,9 +112,9 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return HasMany
      */
-    public function notifications(): HasMany
+    public function emailHistories(): HasMany
     {
-        return $this->hasMany(Notification::class);
+        return $this->hasMany(EmailHistory::class);
     }
 
     /**
@@ -161,7 +161,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function isNotifiedBefore(): bool
     {
-        return $this->notifications()->where('in_progress', 1)->exists();
+        return $this->emailHistories()->where('in_progress', 1)->exists();
     }
 
     public function isDisabled(): bool

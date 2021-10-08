@@ -41,7 +41,7 @@ class LowChargeEmailTest extends TestCase
 
         $userId = $this->loggedInUser->id;
         Mail::assertQueued(LowUserCharge::class, fn($mail) => $mail->user->id = $userId);
-        $this->assertDatabaseHas('notifications', [
+        $this->assertDatabaseHas('email_histories', [
             'user_id' => $userId,
             'in_progress' => 1
         ]);
@@ -67,7 +67,7 @@ class LowChargeEmailTest extends TestCase
 
         $userId = $this->loggedInUser->id;
         Mail::assertQueued(LowUserCharge::class, fn($mail) => $mail->user->id = $userId);
-        $this->assertDatabaseHas('notifications', [
+        $this->assertDatabaseHas('email_histories', [
             'user_id' => $userId,
             'in_progress' => 1
         ]);
@@ -104,7 +104,7 @@ class LowChargeEmailTest extends TestCase
 
         $userId = $this->loggedInUser->id;
         Mail::assertQueued(LowUserCharge::class, fn($mail) => $mail->user->id = $userId);
-        $this->assertDatabaseHas('notifications', [
+        $this->assertDatabaseHas('email_histories', [
             'user_id' => $userId,
             'in_progress' => 1
         ]);
@@ -151,7 +151,7 @@ class LowChargeEmailTest extends TestCase
 
         $userId = $this->loggedInUser->id;
         Mail::assertQueued(LowUserCharge::class, fn($mail) => $mail->user->id = $userId);
-        $this->assertDatabaseHas('notifications', [
+        $this->assertDatabaseHas('email_histories', [
             'user_id' => $userId,
             'in_progress' => 1
         ]);
@@ -183,7 +183,7 @@ class LowChargeEmailTest extends TestCase
 
         $userId = $this->loggedInUser->id;
         Mail::assertNotQueued(LowUserCharge::class, fn($mail) => $mail->user->id = $userId);
-        $this->assertDatabaseMissing('notifications', [
+        $this->assertDatabaseMissing('email_histories', [
             'user_id' => $userId,
             'in_progress' => 1
         ]);

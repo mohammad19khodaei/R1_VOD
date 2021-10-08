@@ -35,7 +35,7 @@ class UserService
 
             if (
                 $newCharge > setting(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) &&
-                $lastNotification = $user->notifications()->where('in_progress', 1)->first()
+                $lastNotification = $user->emailHistories()->where('in_progress', 1)->first()
             ) {
                 $lastNotification->update(['in_progress' => 0]);
             }
