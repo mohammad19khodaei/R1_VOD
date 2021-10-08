@@ -48,7 +48,7 @@ class ArticleController extends ApiController
      * @param CreateArticle $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(CreateArticle $request, ArticleService $articleService, TagService $tagService)
+    public function store(CreateArticle $request)
     {
         $parameters = [
             'title' => $request->input('article.title'),
@@ -57,7 +57,7 @@ class ArticleController extends ApiController
         ];
 
         try {
-            $article = $articleService->createArticle(auth()->id(), $parameters);
+            $article = (new ArticleService())->createArticle(auth()->id(), $parameters);
         } catch (NotEnoughChargeException $exception) {
             return $this->respondForbidden($exception->getMessage());
         }
@@ -67,7 +67,7 @@ class ArticleController extends ApiController
         }
 
         $inputTags = $request->input('article.tagList', []);
-        $tagService->addArticleTags($article, $inputTags);
+        (new TagService())->addArticleTags($article, $inputTags);
 
         return $this->respondWithTransformer($article);
     }

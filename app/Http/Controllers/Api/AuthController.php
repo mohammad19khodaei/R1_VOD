@@ -44,14 +44,14 @@ class AuthController extends ApiController
      * @param RegisterUser $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(RegisterUser $request, UserService $userService)
+    public function register(RegisterUser $request)
     {
         $parameters = [
             'username' => $request->input('user.username'),
             'email' => $request->input('user.email'),
             'password' => $request->input('user.password'),
         ];
-        $user = $userService->createUser($parameters);
+        $user = (new UserService())->createUser($parameters);
 
         if ($user === null) {
             return $this->respondInternalError();
