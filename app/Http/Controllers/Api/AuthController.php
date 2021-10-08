@@ -49,7 +49,7 @@ class AuthController extends ApiController
         $parameters = [
             'username' => $request->input('user.username'),
             'email' => $request->input('user.email'),
-            'password' => bcrypt($request->input('user.password')),
+            'password' => $request->input('user.password'),
         ];
         $user = $userService->createUser($parameters);
 
