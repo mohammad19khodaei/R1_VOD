@@ -25,4 +25,13 @@ class UserService
         }
         return $user;
     }
+
+    public function enableUser(User $user): void
+    {
+        if ($user->balance < 0 || !$user->isDisabled()) {
+            return;
+        }
+
+        $user->update(['disabled_at' => null]);
+    }
 }

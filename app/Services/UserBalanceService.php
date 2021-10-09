@@ -50,20 +50,14 @@ class UserBalanceService
         $user = null;
         DB::beginTransaction();
         try {
-            $newBalance = $this->user->balance + $amount;
-            $attributes = ['balance' => $newBalance];
-
-            (new NotificationLogService($this->user))->resetLowBalanceNotificationStatus($newBalance);
-
-            // enable user
-            if ($newBalance > 0 && $this->user->isDisabled()) {
-                $attributes['disabled_at'] = null;
-            }
-
             (new TransactionService($this->user))->deposit($amount);
+            $user = $this->user->fresh();
+
+            (new NotificationLogService($this->user))->resetLowBalanceNotificationStatus($user->balance);
+
+            (new UserService())->enableUser($user);
 
             DB::commit();
-            $user = tap($this->user)->update($attributes);
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
             DB::rollback();
