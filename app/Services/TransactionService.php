@@ -22,7 +22,7 @@ class TransactionService
             'amount' => $amount,
         ]);
 
-        (new UserChargeService($this->user))->increase($amount);
+        (new UserBalanceService($this->user))->increase($amount);
     }
 
     public function withdraw(int $amount): Transaction
@@ -33,7 +33,7 @@ class TransactionService
             'amount' => $amount,
         ]);
 
-        (new UserChargeService($this->user))->decrease($amount);
+        (new UserBalanceService($this->user))->decrease($amount);
 
         return $transaction;
     }

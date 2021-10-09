@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Article;
 use App\Comment;
 use App\Enums\SettingKey;
-use App\Exceptions\NotEnoughChargeException;
+use App\Exceptions\NotEnoughBalanceException;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +17,7 @@ class CommentService
      * @param User $user
      * @param string $body
      * @return Comment|null
-     * @throws NotEnoughChargeException
+     * @throws NotEnoughBalanceException
      */
     public function addComment(Article $article, User $user, string $body): ?Comment
     {
@@ -25,8 +25,8 @@ class CommentService
         $commentCount = $user->comments()->lockForUpdate()->count();
 
         try {
-            if (!(new UserChargeService($user))->canSubmitComment($commentCount)) {
-                throw new NotEnoughChargeException();
+            if (!(new UserBalanceService($user))->canSubmitComment($commentCount)) {
+                throw new NotEnoughBalanceException();
             }
 
             /** @var Comment $comment */
@@ -42,7 +42,7 @@ class CommentService
             }
 
             DB::commit();
-        } catch (NotEnoughChargeException $exception) {
+        } catch (NotEnoughBalanceException $exception) {
             DB::commit();
             throw $exception;
         } catch (\Exception $exception) {

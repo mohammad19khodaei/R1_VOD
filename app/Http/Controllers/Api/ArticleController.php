@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Exceptions\NotEnoughChargeException;
+use App\Exceptions\NotEnoughBalanceException;
 use App\Services\ArticleService;
 use App\Services\TagService;
 use App\Article;
@@ -58,7 +58,7 @@ class ArticleController extends ApiController
 
         try {
             $article = (new ArticleService())->createArticle(auth()->id(), $parameters);
-        } catch (NotEnoughChargeException $exception) {
+        } catch (NotEnoughBalanceException $exception) {
             return $this->respondForbidden($exception->getMessage());
         }
 

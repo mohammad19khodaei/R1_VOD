@@ -17,10 +17,10 @@ class ArticleCreateTest extends TestCase
     use DatabaseMigrations;
 
     /** @test */
-    public function it_return_forbidden_error_when_trying_to_add_article_without_enough_charge()
+    public function it_return_forbidden_error_when_trying_to_add_article_without_enough_balance()
     {
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => -1000]);
+        $this->loggedInUser->update(['balance' => -1000]);
 
         $data = [
             'article' => [
@@ -35,7 +35,7 @@ class ArticleCreateTest extends TestCase
         $response->assertStatus(403)
             ->assertJson([
                 'errors' => [
-                    'message' => 'Not Enough Charge',
+                    'message' => 'Not Enough Balance',
                     'status_code' => 403
                 ]
             ]);
@@ -91,7 +91,7 @@ class ArticleCreateTest extends TestCase
     }
 
     /** @test */
-    public function it_decrease_charge_of_user_on_creating_a_new_article()
+    public function it_decrease_balance_of_user_on_creating_a_new_article()
     {
         $data = [
             'article' => [
@@ -106,7 +106,7 @@ class ArticleCreateTest extends TestCase
         $this->assertDatabaseHas('users', [
             'username' => $this->loggedInUser->username,
             'email' => $this->loggedInUser->email,
-            'charge' => setting(SettingKey::REGISTRATION_DEPOSIT) - setting(SettingKey::ARTICLE_CREATION_WITHDRAW)
+            'balance' => setting(SettingKey::REGISTRATION_DEPOSIT) - setting(SettingKey::ARTICLE_CREATION_WITHDRAW)
         ]);
     }
 
@@ -139,10 +139,10 @@ class ArticleCreateTest extends TestCase
     }
 
     /** @test */
-    public function it_return_forbbiden_resoponse_for_second_request_if_charge_is_not_enough_for_two_request()
+    public function it_return_forbbiden_resoponse_for_second_request_if_balance_is_not_enough_for_two_request()
     {
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => 3000]);
+        $this->loggedInUser->update(['balance' => 3000]);
 
         $data = [
             'article' => [
@@ -158,7 +158,7 @@ class ArticleCreateTest extends TestCase
         $response->assertStatus(403)
             ->assertJson([
                 'errors' => [
-                    'message' => 'Not Enough Charge',
+                    'message' => 'Not Enough Balance',
                     'status_code' => 403
                 ]
             ]);
@@ -206,10 +206,10 @@ class ArticleCreateTest extends TestCase
     }
 
     /** @test */
-    public function it_disable_user_if_charge_become_negative_after_create_article()
+    public function it_disable_user_if_balance_become_negative_after_create_article()
     {
         Mail::fake();
-        $this->loggedInUser->update(['charge' => 3000]);
+        $this->loggedInUser->update(['balance' => 3000]);
 
 
         $data = [

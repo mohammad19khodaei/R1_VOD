@@ -19,7 +19,7 @@ class SettingsSeeder extends Seeder
             'value' => 5000,
         ],
         [
-            'name' => SettingKey::NOTIFY_USER_CHARGE_THRESHOLD,
+            'name' => SettingKey::NOTIFY_USER_BALANCE_THRESHOLD,
             'value' => 20000,
         ],
         [

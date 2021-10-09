@@ -7,7 +7,7 @@ use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class UserChargeService
+class UserBalanceService
 {
     protected User $user;
 
@@ -18,30 +18,30 @@ class UserChargeService
 
     public function canSubmitArticle(): bool
     {
-        return $this->user->charge > 0;
+        return $this->user->balance > 0;
     }
 
     public function canSubmitComment(int $commentCount): bool
     {
-        return $this->user->charge > 0 || $commentCount < setting(SettingKey::MAX_NUMBER_OF_FREE_COMMENT);
+        return $this->user->balance > 0 || $commentCount < setting(SettingKey::MAX_NUMBER_OF_FREE_COMMENT);
     }
 
     public function increase(int $amount): void
     {
-        $this->user->increment('charge', $amount);
+        $this->user->increment('balance', $amount);
     }
 
     public function decrease(int $amount): void
     {
         $this->user->update([
-            'charge' => DB::raw('charge - ' . $amount),
+            'balance' => DB::raw('balance - ' . $amount),
         ]);
     }
 
     public function chargeNotifyIsRequired(): bool
     {
-        $newCharge = optional($this->user->fresh())->getAttribute('charge');
-        return $newCharge < setting(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) &&
+        $newBalance = optional($this->user->fresh())->getAttribute('balance');
+        return $newBalance < setting(SettingKey::NOTIFY_USER_BALANCE_THRESHOLD) &&
             !$this->user->isNotifiedBefore();
     }
 
@@ -50,14 +50,14 @@ class UserChargeService
         $user = null;
         DB::beginTransaction();
         try {
-            $newCharge = $this->user->charge + $amount;
-            $attributes = ['charge' => $newCharge];
+            $newBalance = $this->user->balance + $amount;
+            $attributes = ['balance' => $newBalance];
 
-            (new EmailHistoryService())->removeLastInProgress($this->user, $newCharge);
+            (new EmailHistoryService())->removeLastInProgress($this->user, $newBalance);
 
 
             // enable user
-            if ($newCharge > 0 && $this->user->isDisabled()) {
+            if ($newBalance > 0 && $this->user->isDisabled()) {
                 $attributes['disabled_at'] = null;
             }
 

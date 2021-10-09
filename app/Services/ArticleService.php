@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Article;
 use App\Enums\SettingKey;
-use App\Exceptions\NotEnoughChargeException;
+use App\Exceptions\NotEnoughBalanceException;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +15,7 @@ class ArticleService
      * @param int $userId
      * @param array $parameters
      * @return Article|null
-     * @throws NotEnoughChargeException
+     * @throws NotEnoughBalanceException
      */
     public function createArticle(int $userId, array $parameters): ?Article
     {
@@ -24,8 +24,8 @@ class ArticleService
         $user = User::query()->lockForUpdate()->whereKey($userId)->first();
 
         try {
-            if (!(new UserChargeService($user))->canSubmitArticle()) {
-                throw new NotEnoughChargeException();
+            if (!(new UserBalanceService($user))->canSubmitArticle()) {
+                throw new NotEnoughBalanceException();
             }
 
             /** @var Article $article */
@@ -35,7 +35,7 @@ class ArticleService
             (new FactorService($transaction))->create($article);
 
             DB::commit();
-        } catch (NotEnoughChargeException $exception) {
+        } catch (NotEnoughBalanceException $exception) {
             DB::commit();
             throw $exception;
         } catch (\Exception $exception) {
