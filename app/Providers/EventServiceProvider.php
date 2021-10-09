@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use App\Events\UserUpdated;
 use App\Listeners\DisableUserListener;
-use App\Listeners\NotifyUserForChargeListener;
+use App\Listeners\NotifyUserForLowBalanceListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -16,7 +16,7 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         UserUpdated::class => [
-            NotifyUserForChargeListener::class,
+            NotifyUserForLowBalanceListener::class,
             DisableUserListener::class,
         ],
     ];

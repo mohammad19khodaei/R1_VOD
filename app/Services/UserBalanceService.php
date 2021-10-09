@@ -42,7 +42,7 @@ class UserBalanceService
     {
         $newBalance = optional($this->user->fresh())->getAttribute('balance');
         return $newBalance < setting(SettingKey::NOTIFY_USER_BALANCE_THRESHOLD) &&
-            !$this->user->isNotifiedBefore();
+            !$this->user->isNotifiedForLowBalanceBefore();
     }
 
     public function chargeUser(int $amount): User
@@ -53,8 +53,7 @@ class UserBalanceService
             $newBalance = $this->user->balance + $amount;
             $attributes = ['balance' => $newBalance];
 
-            (new EmailHistoryService())->removeLastInProgress($this->user, $newBalance);
-
+            (new NotificationLogService($this->user))->resetLowBalanceNotificationStatus($newBalance);
 
             // enable user
             if ($newBalance > 0 && $this->user->isDisabled()) {
