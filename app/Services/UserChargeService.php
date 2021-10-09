@@ -38,7 +38,7 @@ class UserChargeService
         ]);
     }
 
-    public function notifyIsRequired(): bool
+    public function chargeNotifyIsRequired(): bool
     {
         $newCharge = optional($this->user->fresh())->getAttribute('charge');
         return $newCharge < setting(SettingKey::NOTIFY_USER_CHARGE_THRESHOLD) &&

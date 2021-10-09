@@ -19,7 +19,7 @@ class NotifyUserForChargeListener
         $user = $event->user;
         $userChargeService = new UserChargeService($user);
 
-        if ($user->isDirty('charge') && $userChargeService->notifyIsRequired()) {
+        if ($user->isDirty('charge') && $userChargeService->chargeNotifyIsRequired()) {
             (new EmailService())->sendLowChargeEmail($user);
             $user->emailHistories()->create();
         }
