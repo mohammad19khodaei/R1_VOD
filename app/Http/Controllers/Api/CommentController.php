@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Article;
 use App\Comment;
-use App\Exceptions\NotEnoughChargeException;
+use App\Exceptions\NotEnoughBalanceException;
 use App\Http\Requests\Api\CreateComment;
 use App\Http\Requests\Api\DeleteComment;
 use App\RealWorld\Transformers\CommentTransformer;
@@ -57,7 +57,7 @@ class CommentController extends ApiController
                 $user,
                 $request->input('comment.body')
             );
-        } catch (NotEnoughChargeException $exception) {
+        } catch (NotEnoughBalanceException $exception) {
             return $this->respondForbidden($exception->getMessage());
         }
 

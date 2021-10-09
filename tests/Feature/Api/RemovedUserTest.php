@@ -15,11 +15,11 @@ class RemovedUserTest extends TestCase
     public function it_queued_a_job_for_removing_disabled_user()
     {
         Queue::fake();
-        $this->user->update(['charge' => -1000]);
+        $this->user->update(['balance' => -1000]);
 
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
-            'charge' => -1000,
+            'balance' => -1000,
             'disabled_at' => now()
         ]);
 

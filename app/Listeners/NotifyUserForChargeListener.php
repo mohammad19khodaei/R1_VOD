@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\UserUpdated;
 use App\Services\EmailService;
-use App\Services\UserChargeService;
+use App\Services\UserBalanceService;
 
 class NotifyUserForChargeListener
 {
@@ -17,10 +17,9 @@ class NotifyUserForChargeListener
     public function handle(UserUpdated $event)
     {
         $user = $event->user;
-        $userChargeService = new UserChargeService($user);
 
-        if ($user->isDirty('charge') && $userChargeService->notifyIsRequired()) {
-            (new EmailService())->sendLowChargeEmail($user);
+        if ($user->isDirty('balance') && (new UserBalanceService($user))->chargeNotifyIsRequired()) {
+            (new EmailService())->sendLowBalanceEmail($user);
             $user->emailHistories()->create();
         }
     }

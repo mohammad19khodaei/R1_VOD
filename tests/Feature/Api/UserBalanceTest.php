@@ -7,7 +7,7 @@ use App\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class UserChargeTest extends TestCase
+class UserBalanceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -16,7 +16,7 @@ class UserChargeTest extends TestCase
     {
         $dispatcher = User::getEventDispatcher();
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => 19000]);
+        $this->loggedInUser->update(['balance' => 19000]);
         User::setEventDispatcher($dispatcher);
 
         $this->loggedInUser->emailHistories()->create();
@@ -28,7 +28,7 @@ class UserChargeTest extends TestCase
         $userId = $this->loggedInUser->id;
         $this->assertDatabaseHas('users', [
             'id' => $userId,
-            'charge' => 19000 + 10000,
+            'balance' => 19000 + 10000,
         ]);
         $this->assertDatabaseHas('email_histories', [
             'user_id' => $userId,

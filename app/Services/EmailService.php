@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Mail\LowUserCharge;
+use App\Mail\LowUserBalance;
 use App\User;
 use Illuminate\Support\Facades\Mail;
 
 class EmailService
 {
-    public function sendLowChargeEmail(User $user): void
+    public function sendLowBalanceEmail(User $user): void
     {
-        $message = (new LowUserCharge($user))
+        $message = (new LowUserBalance($user))
             ->onConnection('redis')
             ->onQueue('email');
         

@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class LowUserCharge extends Mailable
+class LowUserBalance extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -29,6 +29,6 @@ class LowUserCharge extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.user.lowCharge');
+        return $this->view('emails.user.lowBalance');
     }
 }

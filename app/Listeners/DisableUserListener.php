@@ -24,8 +24,8 @@ class DisableUserListener
         $user = clone $original;
         $user->syncOriginal();
 
-        $charge = optional($user->fresh())->getAttribute('charge');
-        if ($charge < 0 && $original->isDirty('charge')) {
+        $balance = optional($user->fresh())->getAttribute('balance');
+        if ($balance < 0 && $original->isDirty('balance')) {
             $user->disabled_at = now();
             $user->save();
             dispatch(new RemoveDisabledUserJob($user))->delay(now()->addDay());

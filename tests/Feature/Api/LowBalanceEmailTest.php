@@ -4,14 +4,14 @@ namespace Tests\Feature\Api;
 
 use App\Comment;
 use App\Enums\SettingKey;
-use App\Mail\LowUserCharge;
+use App\Mail\LowUserBalance;
 use App\Setting;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
-class LowChargeEmailTest extends TestCase
+class LowBalanceEmailTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -22,11 +22,11 @@ class LowChargeEmailTest extends TestCase
     }
 
     /** @test */
-    public function it_send_low_charge_email_when_charge_become_low_after_create_article()
+    public function it_send_low_balance_email_when_balance_become_low_after_create_article()
     {
         $dispatcher = User::getEventDispatcher();
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => 24000]);
+        $this->loggedInUser->update(['balance' => 24000]);
         User::setEventDispatcher($dispatcher);
 
         $data = [
@@ -40,7 +40,7 @@ class LowChargeEmailTest extends TestCase
         $this->postJson('/api/articles', $data, $this->headers);
 
         $userId = $this->loggedInUser->id;
-        Mail::assertQueued(LowUserCharge::class, fn($mail) => $mail->user->id = $userId);
+        Mail::assertQueued(LowUserBalance::class, fn($mail) => $mail->user->id = $userId);
         $this->assertDatabaseHas('email_histories', [
             'user_id' => $userId,
             'in_progress' => 1
@@ -48,11 +48,11 @@ class LowChargeEmailTest extends TestCase
     }
 
     /** @test */
-    public function it_send_low_charge_email_when_charge_become_low_after_create_article_only_once()
+    public function it_send_low_balance_email_when_balance_become_low_after_create_article_only_once()
     {
         $dispatcher = User::getEventDispatcher();
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => 24000]);
+        $this->loggedInUser->update(['balance' => 24000]);
         User::setEventDispatcher($dispatcher);
 
         $data = [
@@ -66,7 +66,7 @@ class LowChargeEmailTest extends TestCase
         $this->postJson('/api/articles', $data, $this->headers);
 
         $userId = $this->loggedInUser->id;
-        Mail::assertQueued(LowUserCharge::class, fn($mail) => $mail->user->id = $userId);
+        Mail::assertQueued(LowUserBalance::class, fn($mail) => $mail->user->id = $userId);
         $this->assertDatabaseHas('email_histories', [
             'user_id' => $userId,
             'in_progress' => 1
@@ -81,15 +81,15 @@ class LowChargeEmailTest extends TestCase
         ];
 
         $this->postJson('/api/articles', $data, $this->headers);
-        Mail::assertQueued(LowUserCharge::class, 1);
+        Mail::assertQueued(LowUserBalance::class, 1);
     }
 
     /** @test */
-    public function it_send_low_charge_email_again_when_after_charge__user_charge_become_low_again()
+    public function it_send_low_balance_email_again_when_after_user_balance_become_low_again()
     {
         $dispatcher = User::getEventDispatcher();
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => 24000]);
+        $this->loggedInUser->update(['balance' => 24000]);
         User::setEventDispatcher($dispatcher);
 
         $data = [
@@ -103,7 +103,7 @@ class LowChargeEmailTest extends TestCase
         $this->postJson('/api/articles', $data, $this->headers);
 
         $userId = $this->loggedInUser->id;
-        Mail::assertQueued(LowUserCharge::class, fn($mail) => $mail->user->id = $userId);
+        Mail::assertQueued(LowUserBalance::class, fn($mail) => $mail->user->id = $userId);
         $this->assertDatabaseHas('email_histories', [
             'user_id' => $userId,
             'in_progress' => 1
@@ -122,15 +122,15 @@ class LowChargeEmailTest extends TestCase
         ];
 
         $this->postJson('/api/articles', $data, $this->headers);
-        Mail::assertQueued(LowUserCharge::class, 2);
+        Mail::assertQueued(LowUserBalance::class, 2);
     }
 
     /** @test */
-    public function it_send_low_charge_email_when_charge_become_low_after_add_none_free_comment()
+    public function it_send_low_balance_email_when_balance_become_low_after_add_none_free_comment()
     {
         $dispatcher = User::getEventDispatcher();
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => 24000]);
+        $this->loggedInUser->update(['balance' => 24000]);
         User::setEventDispatcher($dispatcher);
 
         $article = $this->user->articles()->save(factory(\App\Article::class)->make());
@@ -150,7 +150,7 @@ class LowChargeEmailTest extends TestCase
         $this->postJson("/api/articles/{$article->slug}/comments", $data, $this->headers);
 
         $userId = $this->loggedInUser->id;
-        Mail::assertQueued(LowUserCharge::class, fn($mail) => $mail->user->id = $userId);
+        Mail::assertQueued(LowUserBalance::class, fn($mail) => $mail->user->id = $userId);
         $this->assertDatabaseHas('email_histories', [
             'user_id' => $userId,
             'in_progress' => 1
@@ -158,11 +158,11 @@ class LowChargeEmailTest extends TestCase
     }
 
     /** @test */
-    public function it_not_send_low_charge_email_when_add_free_comment()
+    public function it_not_send_low_balance_email_when_add_free_comment()
     {
         $dispatcher = User::getEventDispatcher();
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => 24000]);
+        $this->loggedInUser->update(['balance' => 24000]);
         User::setEventDispatcher($dispatcher);
 
         $article = $this->user->articles()->save(factory(\App\Article::class)->make());
@@ -182,7 +182,7 @@ class LowChargeEmailTest extends TestCase
         $this->postJson("/api/articles/{$article->slug}/comments", $data, $this->headers);
 
         $userId = $this->loggedInUser->id;
-        Mail::assertNotQueued(LowUserCharge::class, fn($mail) => $mail->user->id = $userId);
+        Mail::assertNotQueued(LowUserBalance::class, fn($mail) => $mail->user->id = $userId);
         $this->assertDatabaseMissing('email_histories', [
             'user_id' => $userId,
             'in_progress' => 1

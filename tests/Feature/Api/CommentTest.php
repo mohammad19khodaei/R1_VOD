@@ -26,10 +26,10 @@ class CommentTest extends TestCase
     }
 
     /** @test */
-    public function it_return_success_response_when_comment_count_is_under_max_count_without_decrease_user_charge()
+    public function it_return_success_response_when_comment_count_is_under_max_count_without_decrease_user_balance()
     {
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => 5000]);
+        $this->loggedInUser->update(['balance' => 5000]);
 
         $this->article
             ->comments()
@@ -49,14 +49,14 @@ class CommentTest extends TestCase
 
 
         $this->loggedInUser = $this->loggedInUser->fresh();
-        $this->assertEquals(5000, $this->loggedInUser->charge);
+        $this->assertEquals(5000, $this->loggedInUser->balance);
     }
 
     /** @test */
-    public function it_return_success_response_when_comment_count_is_above_max_count_with_decrease_user_charge()
+    public function it_return_success_response_when_comment_count_is_above_max_count_with_decrease_user_balance()
     {
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => 4000]);
+        $this->loggedInUser->update(['balance' => 4000]);
 
         $this->article
             ->comments()
@@ -75,14 +75,14 @@ class CommentTest extends TestCase
             ->assertStatus(200);
 
         $this->loggedInUser = $this->loggedInUser->fresh();
-        $this->assertEquals(-1000, $this->loggedInUser->charge);
+        $this->assertEquals(-1000, $this->loggedInUser->balance);
     }
 
     /** @test */
-    public function it_return_forbidden_error_when_trying_add_first_none_free_comment_without_enough_charge()
+    public function it_return_forbidden_error_when_trying_add_first_none_free_comment_without_enough_balance()
     {
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => -1000]);
+        $this->loggedInUser->update(['balance' => -1000]);
 
         $this->article
             ->comments()
@@ -101,7 +101,7 @@ class CommentTest extends TestCase
         $response->assertStatus(403)
             ->assertJson([
                 'errors' => [
-                    'message' => 'Not Enough Charge',
+                    'message' => 'Not Enough Balance',
                     'status_code' => 403
                 ]
             ]);
@@ -133,7 +133,7 @@ class CommentTest extends TestCase
     public function it_create_transaction_and_factor_on_adding_a_new_comment()
     {
         User::unsetEventDispatcher();
-        $this->loggedInUser->update(['charge' => 5000]);
+        $this->loggedInUser->update(['balance' => 5000]);
 
         $this->article
             ->comments()
@@ -257,10 +257,10 @@ class CommentTest extends TestCase
     }
 
     /** @test */
-    public function it_disable_user_if_charge_become_negative_after_add_new_comment()
+    public function it_disable_user_if_balance_become_negative_after_add_new_comment()
     {
         Mail::fake();
-        $this->loggedInUser->update(['charge' => 3000]);
+        $this->loggedInUser->update(['balance' => 3000]);
 
         $this->article
             ->comments()
