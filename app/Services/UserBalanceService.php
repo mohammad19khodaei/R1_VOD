@@ -47,21 +47,14 @@ class UserBalanceService
 
     public function chargeUser(int $amount): User
     {
-        $user = null;
-        DB::beginTransaction();
-        try {
+        DB::transaction(function () use ($amount, &$user) {
             (new TransactionService($this->user))->deposit($amount);
             $user = $this->user->fresh();
 
             (new NotificationLogService($this->user))->resetLowBalanceNotificationStatus($user->balance);
 
-            (new UserService())->enableUser($user);
-
-            DB::commit();
-        } catch (\Exception $exception) {
-            Log::error($exception->getMessage());
-            DB::rollback();
-        }
+            (new UserService())->enableUser($user, $user->balance);
+        });
 
         return $user;
     }

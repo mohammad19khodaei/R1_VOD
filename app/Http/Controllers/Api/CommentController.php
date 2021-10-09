@@ -10,6 +10,7 @@ use App\Http\Requests\Api\DeleteComment;
 use App\RealWorld\Transformers\CommentTransformer;
 use App\Services\CommentService;
 use App\User;
+use Illuminate\Support\Facades\Log;
 
 class CommentController extends ApiController
 {
@@ -59,9 +60,8 @@ class CommentController extends ApiController
             );
         } catch (NotEnoughBalanceException $exception) {
             return $this->respondForbidden($exception->getMessage());
-        }
-
-        if ($comment === null) {
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
             return $this->respondInternalError();
         }
 

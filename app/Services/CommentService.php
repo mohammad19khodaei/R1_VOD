@@ -8,7 +8,6 @@ use App\Enums\SettingKey;
 use App\Exceptions\NotEnoughBalanceException;
 use App\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class CommentService
 {
@@ -16,15 +15,14 @@ class CommentService
      * @param Article $article
      * @param User $user
      * @param string $body
-     * @return Comment|null
+     * @return Comment
      * @throws NotEnoughBalanceException
      */
-    public function addComment(Article $article, User $user, string $body): ?Comment
+    public function addComment(Article $article, User $user, string $body): Comment
     {
-        DB::beginTransaction();
-        $commentCount = $user->comments()->lockForUpdate()->count();
+        DB::transaction(function () use ($article, $user, $body, &$comment) {
+            $commentCount = $user->comments()->lockForUpdate()->count();
 
-        try {
             if (!(new UserBalanceService($user))->canSubmitComment($commentCount)) {
                 throw new NotEnoughBalanceException();
             }
@@ -40,16 +38,7 @@ class CommentService
                     ->withdraw(setting(SettingKey::COMMENT_CREATION_WITHDRAW));
                 (new FactorService($transaction))->create($comment);
             }
-
-            DB::commit();
-        } catch (NotEnoughBalanceException $exception) {
-            DB::commit();
-            throw $exception;
-        } catch (\Exception $exception) {
-            $comment = null;
-            Log::error($exception->getMessage());
-            DB::rollback();
-        }
+        });
 
         return $comment;
     }

@@ -7,6 +7,7 @@ use App\Http\Requests\Api\RegisterUser;
 use App\RealWorld\Transformers\UserTransformer;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends ApiController
 {
@@ -51,9 +52,11 @@ class AuthController extends ApiController
             'email' => $request->input('user.email'),
             'password' => $request->input('user.password'),
         ];
-        $user = (new UserService())->createUser($parameters);
 
-        if ($user === null) {
+        try {
+            $user = (new UserService())->createUser($parameters);
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
             return $this->respondInternalError();
         }
 

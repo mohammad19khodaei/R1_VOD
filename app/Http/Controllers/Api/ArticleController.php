@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Article;
 use App\Exceptions\NotEnoughBalanceException;
+use App\Http\Requests\Api\CreateArticle;
+use App\Http\Requests\Api\DeleteArticle;
+use App\Http\Requests\Api\UpdateArticle;
+use App\RealWorld\Filters\ArticleFilter;
+use App\RealWorld\Paginate\Paginate;
+use App\RealWorld\Transformers\ArticleTransformer;
 use App\Services\ArticleService;
 use App\Services\TagService;
-use App\Article;
-use App\RealWorld\Paginate\Paginate;
-use App\RealWorld\Filters\ArticleFilter;
-use App\Http\Requests\Api\CreateArticle;
-use App\Http\Requests\Api\UpdateArticle;
-use App\Http\Requests\Api\DeleteArticle;
-use App\RealWorld\Transformers\ArticleTransformer;
+use Illuminate\Support\Facades\Log;
 
 class ArticleController extends ApiController
 {
@@ -60,9 +61,8 @@ class ArticleController extends ApiController
             $article = (new ArticleService())->createArticle(auth()->id(), $parameters);
         } catch (NotEnoughBalanceException $exception) {
             return $this->respondForbidden($exception->getMessage());
-        }
-
-        if ($article === null) {
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
             return $this->respondInternalError();
         }
 

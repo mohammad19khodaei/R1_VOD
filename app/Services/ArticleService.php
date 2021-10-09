@@ -7,23 +7,21 @@ use App\Enums\SettingKey;
 use App\Exceptions\NotEnoughBalanceException;
 use App\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ArticleService
 {
     /**
      * @param int $userId
      * @param array $parameters
-     * @return Article|null
+     * @return Article
      * @throws NotEnoughBalanceException
      */
-    public function createArticle(int $userId, array $parameters): ?Article
+    public function createArticle(int $userId, array $parameters): Article
     {
-        DB::beginTransaction();
-        /** @var User $user */
-        $user = User::query()->lockForUpdate()->whereKey($userId)->first();
+        DB::transaction(function () use ($userId, $parameters, &$article) {
+            /** @var User $user */
+            $user = User::query()->lockForUpdate()->whereKey($userId)->first();
 
-        try {
             if (!(new UserBalanceService($user))->canSubmitArticle()) {
                 throw new NotEnoughBalanceException();
             }
@@ -34,15 +32,7 @@ class ArticleService
             $transaction = (new TransactionService($user))->withdraw(setting(SettingKey::ARTICLE_CREATION_WITHDRAW));
             (new FactorService($transaction))->create($article);
 
-            DB::commit();
-        } catch (NotEnoughBalanceException $exception) {
-            DB::commit();
-            throw $exception;
-        } catch (\Exception $exception) {
-            $article = null;
-            Log::error($exception->getMessage());
-            DB::rollback();
-        }
+        });
 
         return $article;
     }
