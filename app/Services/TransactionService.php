@@ -8,8 +8,6 @@ use App\User;
 
 class TransactionService
 {
-    protected Transaction $transaction;
-
     protected User $user;
 
     public function __construct(User $user)
