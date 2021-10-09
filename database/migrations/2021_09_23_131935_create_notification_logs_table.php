@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEmailHistoriesTable extends Migration
+class CreateNotificationLogsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateEmailHistoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('email_histories', function (Blueprint $table) {
+        Schema::create('notification_logs', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
-            $table->boolean('in_progress')->default(true);
-            $table->timestamps();
+            $table->smallInteger('type');
 
             $table->foreign('user_id')
                 ->references('id')
@@ -33,6 +32,6 @@ class CreateEmailHistoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('notifications');
+        Schema::dropIfExists('notification_logs');
     }
 }

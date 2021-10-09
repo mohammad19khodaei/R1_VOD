@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\NotificationType;
 use App\Events\UserUpdated;
 use App\RealWorld\Favorite\HasFavorite;
 use App\RealWorld\Follow\Followable;
@@ -107,14 +108,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough(Factor::class, Transaction::class);
     }
 
-    /**
-     * Get all the email histories of the following users.
-     *
-     * @return HasMany
-     */
-    public function emailHistories(): HasMany
+    public function notificationLog(): HasMany
     {
-        return $this->hasMany(EmailHistory::class);
+        return $this->hasMany(NotificationLog::class);
     }
 
     /**
@@ -159,9 +155,9 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function isNotifiedBefore(): bool
+    public function isNotifiedForLowBalanceBefore(): bool
     {
-        return $this->emailHistories()->where('in_progress', 1)->exists();
+        return $this->notificationLog()->where('type', NotificationType::LOW_BALANCE_TYPE)->exists();
     }
 
     public function isDisabled(): bool

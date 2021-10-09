@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Api;
 
-use App\Enums\TransactionType;
+use App\Enums\NotificationType;
 use App\User;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class UserBalanceTest extends TestCase
 {
@@ -19,7 +19,7 @@ class UserBalanceTest extends TestCase
         $this->loggedInUser->update(['balance' => 19000]);
         User::setEventDispatcher($dispatcher);
 
-        $this->loggedInUser->emailHistories()->create();
+        $this->loggedInUser->notificationLog()->create(['type' => NotificationType::LOW_BALANCE_TYPE]);
 
         $data = ['amount' => 10000];
         $this->postJson('/api/user/charge', $data, $this->headers)
@@ -30,9 +30,9 @@ class UserBalanceTest extends TestCase
             'id' => $userId,
             'balance' => 19000 + 10000,
         ]);
-        $this->assertDatabaseHas('email_histories', [
+        $this->assertDatabaseMissing('notification_logs', [
             'user_id' => $userId,
-            'in_progress' => 0,
+            'type' => NotificationType::LOW_BALANCE_TYPE,
         ]);
         $this->assertDatabaseHas('transactions', [
             'user_id' => $userId,

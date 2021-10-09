@@ -3,9 +3,9 @@
 namespace Tests\Feature\Api;
 
 use App\Comment;
+use App\Enums\NotificationType;
 use App\Enums\SettingKey;
 use App\Mail\LowUserBalance;
-use App\Setting;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Mail;
@@ -41,9 +41,9 @@ class LowBalanceEmailTest extends TestCase
 
         $userId = $this->loggedInUser->id;
         Mail::assertQueued(LowUserBalance::class, fn($mail) => $mail->user->id = $userId);
-        $this->assertDatabaseHas('email_histories', [
+        $this->assertDatabaseHas('notification_logs', [
             'user_id' => $userId,
-            'in_progress' => 1
+            'type' => NotificationType::LOW_BALANCE_TYPE,
         ]);
     }
 
@@ -67,9 +67,9 @@ class LowBalanceEmailTest extends TestCase
 
         $userId = $this->loggedInUser->id;
         Mail::assertQueued(LowUserBalance::class, fn($mail) => $mail->user->id = $userId);
-        $this->assertDatabaseHas('email_histories', [
+        $this->assertDatabaseHas('notification_logs', [
             'user_id' => $userId,
-            'in_progress' => 1
+            'type' => NotificationType::LOW_BALANCE_TYPE,
         ]);
 
         $data = [
@@ -104,9 +104,9 @@ class LowBalanceEmailTest extends TestCase
 
         $userId = $this->loggedInUser->id;
         Mail::assertQueued(LowUserBalance::class, fn($mail) => $mail->user->id = $userId);
-        $this->assertDatabaseHas('email_histories', [
+        $this->assertDatabaseHas('notification_logs', [
             'user_id' => $userId,
-            'in_progress' => 1
+            'type' => NotificationType::LOW_BALANCE_TYPE,
         ]);
 
         // charge account
@@ -151,9 +151,9 @@ class LowBalanceEmailTest extends TestCase
 
         $userId = $this->loggedInUser->id;
         Mail::assertQueued(LowUserBalance::class, fn($mail) => $mail->user->id = $userId);
-        $this->assertDatabaseHas('email_histories', [
+        $this->assertDatabaseHas('notification_logs', [
             'user_id' => $userId,
-            'in_progress' => 1
+            'type' => NotificationType::LOW_BALANCE_TYPE,
         ]);
     }
 
@@ -183,9 +183,9 @@ class LowBalanceEmailTest extends TestCase
 
         $userId = $this->loggedInUser->id;
         Mail::assertNotQueued(LowUserBalance::class, fn($mail) => $mail->user->id = $userId);
-        $this->assertDatabaseMissing('email_histories', [
+        $this->assertDatabaseMissing('notification_logs', [
             'user_id' => $userId,
-            'in_progress' => 1
+            'type' => NotificationType::LOW_BALANCE_TYPE,
         ]);
     }
 }

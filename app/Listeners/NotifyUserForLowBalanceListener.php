@@ -2,11 +2,12 @@
 
 namespace App\Listeners;
 
+use App\Enums\NotificationType;
 use App\Events\UserUpdated;
 use App\Services\EmailService;
 use App\Services\UserBalanceService;
 
-class NotifyUserForChargeListener
+class NotifyUserForLowBalanceListener
 {
     /**
      * Handle the event.
@@ -20,7 +21,7 @@ class NotifyUserForChargeListener
 
         if ($user->isDirty('balance') && (new UserBalanceService($user))->chargeNotifyIsRequired()) {
             (new EmailService())->sendLowBalanceEmail($user);
-            $user->emailHistories()->create();
+            $user->notificationLog()->create(['type' => NotificationType::LOW_BALANCE_TYPE]);
         }
     }
 }
