@@ -22,7 +22,9 @@ You can log in to the application using following credentials
 ## Database
 It's the structure of new tables
 
+![r1_vod_db](https://user-images.githubusercontent.com/30317757/136672836-4dfdd007-ff2d-41bb-8b0b-051490dbc9bf.png)
 
 
 
-![r1_vod_db](https://user-images.githubusercontent.com/30317757/136672810-5ecbf298-b81a-41bf-865c-635532c0183c.png)
+
+
