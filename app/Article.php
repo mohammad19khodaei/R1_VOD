@@ -7,10 +7,11 @@ use App\RealWorld\Slug\HasSlug;
 use App\RealWorld\Filters\Filterable;
 use App\RealWorld\Favorite\Favoritable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Article extends Model implements ProductContract
 {
-    use Favoritable, Filterable, HasSlug;
+    use Favoritable, Filterable, HasSlug, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

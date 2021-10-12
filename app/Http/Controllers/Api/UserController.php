@@ -7,6 +7,7 @@ use App\Http\Requests\Api\UpdateUser;
 use App\RealWorld\Transformers\UserTransformer;
 use App\Services\UserBalanceService;
 use App\User;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends ApiController
 {
@@ -53,9 +54,10 @@ class UserController extends ApiController
     {
         /** @var User $user */
         $user = auth()->user();
-        $user = (new UserBalanceService($user))->chargeUser($request->get('amount'));
-
-        if ($user === null) {
+        try {
+            $user = (new UserBalanceService($user))->chargeUser($request->get('amount'));
+        } catch (\Exception $exception) {
+            Log::info($exception->getMessage());
             return $this->respondInternalError();
         }
 
