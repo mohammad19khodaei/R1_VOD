@@ -47,14 +47,8 @@ class AuthController extends ApiController
      */
     public function register(RegisterUser $request)
     {
-        $parameters = [
-            'username' => $request->input('user.username'),
-            'email' => $request->input('user.email'),
-            'password' => $request->input('user.password'),
-        ];
-
         try {
-            $user = (new UserService())->createUser($parameters);
+            $user = (new UserService())->createUser($request->getParameters());
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
             return $this->respondInternalError();

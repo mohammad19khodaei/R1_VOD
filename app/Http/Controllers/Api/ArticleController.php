@@ -51,14 +51,8 @@ class ArticleController extends ApiController
      */
     public function store(CreateArticle $request)
     {
-        $parameters = [
-            'title' => $request->input('article.title'),
-            'description' => $request->input('article.description'),
-            'body' => $request->input('article.body'),
-        ];
-
         try {
-            $article = (new ArticleService())->createArticle(auth()->id(), $parameters);
+            $article = (new ArticleService())->createArticle(auth()->id(), $request->getParameters());
         } catch (NotEnoughBalanceException $exception) {
             return $this->respondForbidden($exception->getMessage());
         } catch (\Exception $exception) {

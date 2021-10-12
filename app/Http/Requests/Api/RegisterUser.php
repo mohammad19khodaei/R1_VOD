@@ -27,4 +27,13 @@ class RegisterUser extends ApiRequest
             'password' => 'required|min:6',
         ];
     }
+
+    public function getParameters(): array
+    {
+        return [
+            'username' => $this->input('user.username'),
+            'email' => $this->input('user.email'),
+            'password' => $this->input('user.password'),
+        ];
+    }
 }

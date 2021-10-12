@@ -28,4 +28,13 @@ class CreateArticle extends ApiRequest
             'tagList' => 'sometimes|array',
         ];
     }
+
+    public function getParameters():array
+    {
+        return [
+            'title' => $this->input('article.title'),
+            'description' => $this->input('article.description'),
+            'body' => $this->input('article.body'),
+        ];
+    }
 }
