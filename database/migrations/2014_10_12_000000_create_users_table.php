@@ -25,6 +25,7 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->timestamp('disabled_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['username', 'email']);
         });

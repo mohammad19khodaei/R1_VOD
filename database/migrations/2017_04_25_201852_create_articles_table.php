@@ -21,6 +21,7 @@ class CreateArticlesTable extends Migration
             $table->string('description');
             $table->text('body');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique('slug');
 

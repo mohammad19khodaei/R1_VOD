@@ -37,6 +37,8 @@ class RemoveDisabledUserJob implements ShouldQueue
             return;
         }
 
+        $this->user->comments()->delete();
+        $this->user->articles()->delete();
         $this->user->delete();
     }
 }

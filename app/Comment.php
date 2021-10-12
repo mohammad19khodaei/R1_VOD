@@ -4,9 +4,11 @@ namespace App;
 
 use App\Contracts\ProductContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Comment extends Model implements ProductContract
 {
+    use SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *
